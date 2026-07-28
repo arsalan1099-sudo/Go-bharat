@@ -1,0 +1,54 @@
+{
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_DEV_MODE": "true"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "credentialsSource": "remote",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk",
+        "credentialsSource": "remote"
+      },
+      "env": {
+        "EXPO_PUBLIC_DEV_MODE": "false",
+        "EXPO_PUBLIC_DOMAIN": "go-bharat.replit.app"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "credentialsSource": "remote",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "app-bundle",
+        "credentialsSource": "remote"
+      },
+      "env": {
+        "EXPO_PUBLIC_DEV_MODE": "false",
+        "EXPO_PUBLIC_DOMAIN": "go-bharat.replit.app"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

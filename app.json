@@ -1,0 +1,373 @@
+{
+  "expo": {
+    "name": "Go Bharat",
+    "slug": "go-bharat",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "gobharat",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1E3D"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.gobharat",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Go Bharat needs access to your camera to take photos for product reviews, reels, and profile pictures.",
+        "NSPhotoLibraryUsageDescription": "Go Bharat needs access to your photo library to upload images for product reviews, reels, and profile pictures.",
+        "NSLocationWhenInUseUsageDescription": "Go Bharat needs your location to show nearby stores, vendors, and provide accurate delivery tracking.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Go Bharat needs continuous location access to provide real-time delivery tracking when you are an active delivery partner.",
+        "NSContactsUsageDescription": "Go Bharat can access your contacts to help you refer friends and share deals.",
+        "NSUserTrackingUsageDescription": "Go Bharat uses this to provide personalized offers and improve your shopping experience.",
+        "NSMicrophoneUsageDescription": "Go Bharat needs microphone access to record audio for reels and video content.",
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          }
+        ],
+        "NSPrivacyCollectedDataTypes": [
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePhoneNumber",
+            "NSPrivacyCollectedDataTypeLinked": true,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypeName",
+            "NSPrivacyCollectedDataTypeLinked": true,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePreciseLocation",
+            "NSPrivacyCollectedDataTypeLinked": true,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePhotosOrVideos",
+            "NSPrivacyCollectedDataTypeLinked": true,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePurchaseHistory",
+            "NSPrivacyCollectedDataTypeLinked": true,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          },
+          {
+            "NSPrivacyCollectedDataType": "NSPrivacyCollectedDataTypePaymentInfo",
+            "NSPrivacyCollectedDataTypeLinked": true,
+            "NSPrivacyCollectedDataTypeTracking": false,
+            "NSPrivacyCollectedDataTypePurposes": [
+              "NSPrivacyCollectedDataTypePurposeAppFunctionality"
+            ]
+          }
+        ]
+      }
+    },
+    "android": {
+      "package": "com.gobharat",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.INTERNET",
+        "android.permission.READ_CONTACTS",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "gobharat",
+              "host": "*"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "*.gobharat.com",
+              "pathPrefix": "/privacy"
+            },
+            {
+              "scheme": "https",
+              "host": "*.gobharat.com",
+              "pathPrefix": "/terms"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/images/favicon.png",
+      "name": "Go Bharat",
+      "shortName": "Go Bharat",
+      "description": "India's hyperlocal super app — shop local, order food, book services, and support businesses near you.",
+      "themeColor": "#FF6B00",
+      "backgroundColor": "#0B1E3D",
+      "lang": "en"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://gobharat.com"
+        }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Go Bharat needs access to your photo library to upload images for product reviews, reels, and profile pictures.",
+          "cameraPermission": "Go Bharat needs access to your camera to take photos for product reviews, reels, and profile pictures."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Go Bharat needs continuous location access to provide real-time delivery tracking when you are an active delivery partner.",
+          "locationWhenInUsePermission": "Go Bharat needs your location to show nearby stores, vendors, and provide accurate delivery tracking."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#0B1E3D"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e5ce64db-14b5-48d5-a490-ca561f7844d8"
+      },
+      "_dataSafety": {
+        "_description": "Play Store Data Safety form reference — this section documents data collected by the app",
+        "dataCollected": [
+          {
+            "category": "Personal info",
+            "types": [
+              "Name",
+              "Phone number",
+              "Email address",
+              "Address"
+            ],
+            "purpose": [
+              "App functionality",
+              "Account management"
+            ],
+            "shared": false,
+            "optional": false
+          },
+          {
+            "category": "Financial info",
+            "types": [
+              "Purchase history",
+              "Payment info (UPI, cards, wallet)"
+            ],
+            "purpose": [
+              "App functionality"
+            ],
+            "shared": true,
+            "sharedWith": [
+              "Payment processors (Razorpay)"
+            ],
+            "optional": false
+          },
+          {
+            "category": "Location",
+            "types": [
+              "Approximate location",
+              "Precise location"
+            ],
+            "purpose": [
+              "App functionality (delivery tracking, nearby stores)"
+            ],
+            "shared": false,
+            "optional": false
+          },
+          {
+            "category": "Photos and videos",
+            "types": [
+              "Photos (product reviews, reels, profile pictures)"
+            ],
+            "purpose": [
+              "App functionality"
+            ],
+            "shared": false,
+            "optional": true
+          },
+          {
+            "category": "Device or other IDs",
+            "types": [
+              "Device ID (push notification token)"
+            ],
+            "purpose": [
+              "App functionality (push notifications)"
+            ],
+            "shared": true,
+            "sharedWith": [
+              "Expo Push Notification Service"
+            ],
+            "optional": true
+          },
+          {
+            "category": "Contacts",
+            "types": [
+              "Contacts (for referrals)"
+            ],
+            "purpose": [
+              "App functionality"
+            ],
+            "shared": false,
+            "optional": true
+          },
+          {
+            "category": "Personal info",
+            "types": [
+              "Name",
+              "Phone number",
+              "Email address",
+              "Address"
+            ],
+            "purpose": [
+              "App functionality",
+              "Account management"
+            ],
+            "shared": false,
+            "optional": false
+          },
+          {
+            "category": "Financial info",
+            "types": [
+              "Purchase history",
+              "Payment info (UPI, cards, wallet)"
+            ],
+            "purpose": [
+              "App functionality"
+            ],
+            "shared": true,
+            "sharedWith": [
+              "Payment processors (Razorpay)"
+            ],
+            "optional": false
+          },
+          {
+            "category": "Location",
+            "types": [
+              "Approximate location",
+              "Precise location"
+            ],
+            "purpose": [
+              "App functionality (delivery tracking, nearby stores)"
+            ],
+            "shared": false,
+            "optional": false
+          },
+          {
+            "category": "Photos and videos",
+            "types": [
+              "Photos (product reviews, reels, profile pictures)"
+            ],
+            "purpose": [
+              "App functionality"
+            ],
+            "shared": false,
+            "optional": true
+          },
+          {
+            "category": "Device or other IDs",
+            "types": [
+              "Device ID (push notification token)"
+            ],
+            "purpose": [
+              "App functionality (push notifications)"
+            ],
+            "shared": true,
+            "sharedWith": [
+              "Expo Push Notification Service"
+            ],
+            "optional": true
+          },
+          {
+            "category": "Contacts",
+            "types": [
+              "Contacts (for referrals)"
+            ],
+            "purpose": [
+              "App functionality"
+            ],
+            "shared": false,
+            "optional": true
+          }
+        ],
+        "securityPractices": {
+          "dataEncryptedInTransit": true,
+          "dataCanBeDeleted": true,
+          "independentSecurityReview": false
+        },
+        "privacyPolicyUrl": "https://gobharat.com/privacy",
+        "termsOfServiceUrl": "https://gobharat.com/terms"
+      },
+      "router": {
+        "origin": "https://gobharat.com"
+      }
+    },
+    "owner": "arsalan109"
+  }
+}
