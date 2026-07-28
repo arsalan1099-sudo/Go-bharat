@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOBHARAT Super Admin Panel</title>
+  <meta name="description" content="Go Bharat Super Admin Panel — manage vendors, orders, withdrawals, and platform settings." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;background:#F0F2F8;color:#1A1A2E;display:flex;min-height:100vh}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f1f1f1}::-webkit-scrollbar-thumb{background:#c4c4c4;border-radius:3px}
+
+    .sidebar{width:260px;background:linear-gradient(180deg,#0B1E3D 0%,#142F5E 100%);color:#fff;position:fixed;top:0;left:0;bottom:0;z-index:50;display:flex;flex-direction:column;transition:transform .3s}
+    .sidebar-header{padding:24px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px}
+    .sidebar-logo{width:56px;height:40px;flex-shrink:0}
+    .sidebar-logo img{width:100%;height:100%;object-fit:contain}
+    .sidebar-title{font-size:18px;font-weight:700}
+    .sidebar-title span{color:#FF6B00}
+    .sidebar-subtitle{font-size:11px;color:rgba(255,255,255,.5);font-weight:400}
+    .sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+    .nav-group{margin-bottom:6px}
+    .nav-group-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;padding:8px 12px}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;transition:all .2s;font-size:13.5px;font-weight:500;color:rgba(255,255,255,.6)}
+    .nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+    .nav-item.active{background:rgba(255,107,0,.15);color:#FF6B00;font-weight:600}
+    .nav-item .material-icons-round{font-size:20px}
+    .nav-item .badge{margin-left:auto;background:#FF6B00;color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
+    .sidebar-footer{padding:16px;border-top:1px solid rgba(255,255,255,.1)}
+    .admin-profile{display:flex;align-items:center;gap:10px;padding:8px}
+    .admin-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#FF6B00,#FF8A33);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+    .admin-info{flex:1;min-width:0}
+    .admin-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .admin-role{font-size:11px;color:rgba(255,255,255,.45)}
+    .view-site-btn{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);transition:all .2s;text-decoration:none;margin-top:8px}
+    .view-site-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+
+    .main{margin-left:260px;flex:1;min-height:100vh}
+    .topbar{background:#fff;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #E5E7EB;position:sticky;top:0;z-index:40}
+    .topbar-left{display:flex;align-items:center;gap:16px}
+    .menu-toggle{display:none;background:none;border:none;cursor:pointer;color:#1A1A2E;font-size:24px}
+    .page-title{font-size:20px;font-weight:700;color:#0B1E3D}
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .topbar-btn{width:38px;height:38px;border-radius:10px;border:1px solid #E5E7EB;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all .2s}
+    .topbar-btn:hover{background:#F5F6FA;border-color:#d1d5db}
+    .topbar-btn .dot{position:absolute;top:7px;right:7px;width:8px;height:8px;background:#EF4444;border-radius:50%;border:2px solid #fff}
+    .search-box{display:flex;align-items:center;gap:8px;background:#F5F6FA;border:1px solid #E5E7EB;border-radius:10px;padding:8px 14px;min-width:260px}
+    .search-box input{border:none;background:none;outline:none;font-family:'Poppins',sans-serif;font-size:13px;flex:1;color:#1A1A2E}
+    .search-box .material-icons-round{font-size:18px;color:#9CA3AF}
+
+    .content{padding:24px 28px}
+
+    .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px}
+    .kpi-card{border-radius:14px;padding:22px 24px;color:#fff;position:relative;overflow:hidden}
+    .kpi-card .kpi-label{font-size:12px;font-weight:500;opacity:.85;margin-bottom:4px}
+    .kpi-card .kpi-value{font-size:26px;font-weight:800}
+    .kpi-card .kpi-sub{font-size:11px;opacity:.7;margin-top:4px}
+    .kpi-card .kpi-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:44px;opacity:.18}
+    .kpi-green{background:linear-gradient(135deg,#16A34A,#22C55E)}
+    .kpi-blue{background:linear-gradient(135deg,#2563EB,#3B82F6)}
+    .kpi-saffron{background:linear-gradient(135deg,#EA580C,#FF6B00)}
+    .kpi-purple{background:linear-gradient(135deg,#7C3AED,#8B5CF6)}
+
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px}
+    .stat-card{background:#fff;border-radius:14px;padding:22px;border:1px solid #E5E7EB;transition:all .2s;cursor:pointer}
+    .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.06)}
+    .stat-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+    .stat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+    .stat-icon .material-icons-round{font-size:22px;color:#fff}
+    .stat-change{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px}
+    .stat-change.up{background:#E6FFF5;color:#10B981}
+    .stat-change.down{background:#FEE2E2;color:#EF4444}
+    .stat-value{font-size:26px;font-weight:800;color:#0B1E3D;margin-bottom:2px}
+    .stat-label{font-size:12px;color:#6B7280;font-weight:500}
+
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+    .grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-bottom:24px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:24px}
+
+    .card{background:#fff;border-radius:14px;border:1px solid #E5E7EB;overflow:hidden}
+    .card-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #F3F4F6}
+    .card-title{font-size:15px;font-weight:700;color:#0B1E3D}
+    .card-action{font-size:12px;font-weight:600;color:#FF6B00;cursor:pointer;background:none;border:none;font-family:'Poppins';display:inline-flex;align-items:center;gap:4px}
+    .card-action:hover{text-decoration:underline}
+    .card-body{padding:18px 22px}
+
+    .export-btn{padding:8px 18px;border-radius:8px;font-family:'Poppins';font-size:12px;font-weight:600;border:1px solid #E5E7EB;background:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:#374151;transition:all .2s}
+    .export-btn:hover{background:#F5F6FA;border-color:#d1d5db}
+    .export-btn .material-icons-round{font-size:16px}
+
+    table{width:100%;border-collapse:collapse}
+    th{text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.5px;padding:11px 14px;border-bottom:1px solid #F3F4F6;background:#FAFBFC}
+    td{padding:11px 14px;font-size:13px;border-bottom:1px solid #F3F4F6;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#FAFBFC}
+
+    .status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
+    .status-badge.active,.status-badge.delivered,.status-badge.live,.status-badge.paid,.status-badge.approve{background:#E6FFF5;color:#10B981}
+    .status-badge.pending,.status-badge.preparing{background:#FEF3C7;color:#F59E0B}
+    .status-badge.inactive,.status-badge.cancelled,.status-badge.banned,.status-badge.rejected,.status-badge.suspended{background:#FEE2E2;color:#EF4444}
+    .status-badge.new,.status-badge.processing{background:#EBF5FF;color:#3B82F6}
+    .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+
+    .action-btn{width:30px;height:30px;border-radius:8px;border:1px solid #E5E7EB;background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;margin-right:4px;transition:all .2s}
+    .action-btn:hover{background:#F5F6FA}
+    .action-btn .material-icons-round{font-size:15px;color:#6B7280}
+    .action-btn.danger:hover{background:#FEE2E2;border-color:#fca5a5}
+    .action-btn.danger:hover .material-icons-round{color:#EF4444}
+
+    .page{display:none}
+    .page.active{display:block}
+
+    .tab-bar{display:flex;gap:4px;background:#F5F6FA;border-radius:10px;padding:4px;margin-bottom:18px;flex-wrap:wrap}
+    .tab-item{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;color:#6B7280;white-space:nowrap}
+    .tab-item.active{background:#fff;color:#0B1E3D;box-shadow:0 2px 4px rgba(0,0,0,.06);font-weight:600}
+
+    .form-group{margin-bottom:14px}
+    .form-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block}
+    .form-input{width:100%;padding:9px 14px;border:1px solid #E5E7EB;border-radius:8px;font-family:'Poppins';font-size:13px;color:#1A1A2E;outline:none;transition:border .2s}
+    .form-input:focus{border-color:#FF6B00}
+    .form-input-sm{width:80px;padding:6px 10px;border:1px solid #E5E7EB;border-radius:6px;font-family:'Poppins';font-size:13px;color:#1A1A2E;outline:none;text-align:center}
+
+    .btn{padding:9px 20px;border-radius:8px;font-family:'Poppins';font-size:12px;font-weight:600;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+    .btn-primary{background:#FF6B00;color:#fff}.btn-primary:hover{background:#E55D00}
+    .btn-secondary{background:#F5F6FA;color:#374151;border:1px solid #E5E7EB}.btn-secondary:hover{background:#E5E7EB}
+    .btn-danger{background:#FEE2E2;color:#EF4444}.btn-danger:hover{background:#FECACA}
+    .btn-success{background:#E6FFF5;color:#10B981}.btn-success:hover{background:#D1FAE5}
+    .btn-sm{padding:6px 14px;font-size:11px}
+
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+    .modal-overlay.show{display:flex}
+    .modal{background:#fff;border-radius:16px;width:90%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+    .modal-header{padding:18px 22px;border-bottom:1px solid #F3F4F6;display:flex;align-items:center;justify-content:space-between}
+    .modal-title{font-size:16px;font-weight:700;color:#0B1E3D}
+    .modal-close{background:none;border:none;cursor:pointer;color:#6B7280;font-size:22px;display:flex}
+    .modal-body{padding:22px}
+    .modal-footer{padding:14px 22px;border-top:1px solid #F3F4F6;display:flex;gap:10px;justify-content:flex-end}
+
+    .commission-rule{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #F3F4F6}
+    .commission-rule:last-child{border-bottom:none}
+    .commission-rule-label{font-size:13px;font-weight:600;color:#374151}
+    .commission-rule-right{display:flex;align-items:center;gap:10px}
+
+    .report-item{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid #E5E7EB;border-radius:10px;margin-bottom:10px;background:#FAFBFC;transition:all .2s}
+    .report-item:hover{background:#F0F2F8;border-color:#d1d5db}
+    .report-item-left{display:flex;align-items:center;gap:12px}
+    .report-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#FF6B00,#FF8A33)}
+    .report-icon .material-icons-round{font-size:20px;color:#fff}
+    .report-name{font-size:13px;font-weight:600;color:#0B1E3D}
+    .report-desc{font-size:11px;color:#9CA3AF}
+
+    .chart-container{position:relative;height:240px;width:100%}
+    .chart-container-sm{position:relative;height:180px;width:100%}
+
+    .section-title{font-size:16px;font-weight:700;color:#0B1E3D;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+    .overlay-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:45}
+    .overlay-bg.show{display:block}
+
+    @media(max-width:1024px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0)}
+      .main{margin-left:0}
+      .menu-toggle{display:flex}
+      .kpi-row,.stats-grid{grid-template-columns:repeat(2,1fr)}
+      .grid-2,.grid-2-1,.grid-3{grid-template-columns:1fr}
+      .search-box{min-width:160px}
+    }
+    @media(max-width:640px){
+      .kpi-row,.stats-grid{grid-template-columns:1fr}
+      .topbar{padding:12px 16px}
+      .content{padding:16px}
+      .search-box{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay-bg" id="overlayBg" onclick="closeSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo"><img src="/assets/images/go-bharat-logo-nobg.png" alt="Go Bharat"></div>
+    <div>
+      <div class="sidebar-title">GO<span>BHARAT</span></div>
+      <div class="sidebar-subtitle">Super Admin Panel</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Overview</div>
+      <div class="nav-item active" data-page="dashboard"><span class="material-icons-round">location_city</span>City Overview</div>
+      <div class="nav-item" data-page="franchise"><span class="material-icons-round">business</span>Franchise Mgt</div>
+      <div class="nav-item" data-page="executive"><span class="material-icons-round">supervisor_account</span>Exec Mgt</div>
+      <div class="nav-item" data-page="team"><span class="material-icons-round">group_add</span>Team Management</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Finance</div>
+      <div class="nav-item" data-page="cash"><span class="material-icons-round">account_balance_wallet</span>Cash & Payouts</div>
+      <div class="nav-item" data-page="credits"><span class="material-icons-round">receipt_long</span>Credits & Bills</div>
+      <div class="nav-item" data-page="commissions"><span class="material-icons-round">pie_chart</span>Commissions</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Marketing</div>
+      <div class="nav-item" data-page="ads"><span class="material-icons-round">campaign</span>Ads & Reels</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">System</div>
+      <div class="nav-item" data-page="activity"><span class="material-icons-round">track_changes</span>User Activity</div>
+      <div class="nav-item" data-page="access"><span class="material-icons-round">admin_panel_settings</span>Access Control</div>
+      <div class="nav-item" data-page="reports"><span class="material-icons-round">assessment</span>Reports & Logs</div>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-profile">
+      <div class="admin-avatar">SA</div>
+      <div class="admin-info">
+        <div class="admin-name">Super Admin</div>
+        <div class="admin-role">GOBHARAT Platform</div>
+      </div>
+    </div>
+    <a href="/" class="view-site-btn"><span class="material-icons-round">language</span>View Website</a>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <span class="material-icons-round">menu</span>
+      </button>
+      <h1 class="page-title" id="pageTitle">City Overview</h1>
+    </div>
+    <div class="topbar-right">
+      <div class="search-box">
+        <span class="material-icons-round">search</span>
+        <input type="text" placeholder="Search franchises, executives..." id="globalSearch">
+      </div>
+      <button class="topbar-btn"><span class="material-icons-round">notifications</span><span class="dot"></span></button>
+      <button class="topbar-btn"><span class="material-icons-round">settings</span></button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- PAGE 1: City Overview / Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-row">
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">Total Revenue</div>
+          <div class="kpi-value">&#8377;29,320</div>
+          <div class="kpi-sub">+12.5% from last month</div>
+          <span class="material-icons-round kpi-icon">trending_up</span>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label">Total Orders</div>
+          <div class="kpi-value">&#8377;20,628</div>
+          <div class="kpi-sub">+8.3% from last month</div>
+          <span class="material-icons-round kpi-icon">shopping_cart</span>
+        </div>
+        <div class="kpi-card kpi-saffron">
+          <div class="kpi-label">Commission Earned</div>
+          <div class="kpi-value">&#8377;27,800</div>
+          <div class="kpi-sub">+15.1% from last month</div>
+          <span class="material-icons-round kpi-icon">account_balance</span>
+        </div>
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-label">Active Users</div>
+          <div class="kpi-value">&#8377;19,300</div>
+          <div class="kpi-sub">+340 new this week</div>
+          <span class="material-icons-round kpi-icon">people</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Total Customers</span>
+            <button class="card-action">This Month</button>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartCustomers"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">State Revenues</span>
+            <button class="card-action">View All</button>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartStateRevenue"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2-1">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">City Deliveries</span>
+            <button class="card-action">Export</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>City</th><th>Orders</th><th>Revenue</th><th>Growth</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:600">Mumbai</td><td>1,245</td><td>&#8377;8,45,200</td><td><span class="stat-change up">+14.2%</span></td></tr>
+                <tr><td style="font-weight:600">Delhi NCR</td><td>1,089</td><td>&#8377;7,23,800</td><td><span class="stat-change up">+11.8%</span></td></tr>
+                <tr><td style="font-weight:600">Pune</td><td>876</td><td>&#8377;5,67,400</td><td><span class="stat-change up">+9.5%</span></td></tr>
+                <tr><td style="font-weight:600">Nashik</td><td>654</td><td>&#8377;3,89,100</td><td><span class="stat-change up">+7.2%</span></td></tr>
+                <tr><td style="font-weight:600">Bangalore</td><td>543</td><td>&#8377;4,12,600</td><td><span class="stat-change up">+18.3%</span></td></tr>
+                <tr><td style="font-weight:600">Hyderabad</td><td>432</td><td>&#8377;2,98,500</td><td><span class="stat-change down">-2.1%</span></td></tr>
+                <tr><td style="font-weight:600">Jaipur</td><td>321</td><td>&#8377;1,87,300</td><td><span class="stat-change up">+5.6%</span></td></tr>
+                <tr><td style="font-weight:600">Nagpur</td><td>298</td><td>&#8377;1,56,800</td><td><span class="stat-change up">+3.4%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Promotion Conversions</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container-sm">
+              <canvas id="chartPromotion"></canvas>
+            </div>
+            <div style="margin-top:14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:#6B7280">Coupon Redeemed</span><span style="font-size:13px;font-weight:700;color:#0B1E3D">2,340</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;color:#6B7280">Referral Signups</span><span style="font-size:13px;font-weight:700;color:#0B1E3D">1,120</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#6B7280">Ad Clicks</span><span style="font-size:13px;font-weight:700;color:#0B1E3D">5,670</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: Franchise Management -->
+    <div class="page" id="page-franchise">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div class="section-title" style="margin-bottom:0">Franchise Management</div>
+        <button class="export-btn"><span class="material-icons-round">file_download</span>Export All / View</button>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active">All Franchises</div>
+        <div class="tab-item">Zones Setup</div>
+        <div class="tab-item">Info</div>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead>
+              <tr><th>Franchise Name</th><th>State</th><th>Owner</th><th>Revenue</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600">GoBharat Malegaon</td>
+                <td>Maharashtra</td>
+                <td>Rajesh Patil</td>
+                <td>&#8377;4,52,300</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">GoBharat Nashik</td>
+                <td>Maharashtra</td>
+                <td>Sunil Deshmukh</td>
+                <td>&#8377;6,78,500</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">GoBharat Pune</td>
+                <td>Maharashtra</td>
+                <td>Amit Kulkarni</td>
+                <td>&#8377;9,34,200</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">GoBharat Mumbai</td>
+                <td>Maharashtra</td>
+                <td>Priya Sharma</td>
+                <td>&#8377;12,56,800</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">GoBharat Delhi NCR</td>
+                <td>Delhi</td>
+                <td>Vikram Singh</td>
+                <td>&#8377;11,23,400</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">GoBharat Jaipur</td>
+                <td>Rajasthan</td>
+                <td>Deepak Rathore</td>
+                <td>&#8377;3,89,600</td>
+                <td><span class="status-badge inactive">Inactive</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">GoBharat Nagpur</td>
+                <td>Maharashtra</td>
+                <td>Manish Bhosle</td>
+                <td>&#8377;2,67,100</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">GoBharat Aurangabad</td>
+                <td>Maharashtra</td>
+                <td>Sneha Jadhav</td>
+                <td>&#8377;1,98,700</td>
+                <td><span class="status-badge inactive">Inactive</span></td>
+                <td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 3: Executive Overview -->
+    <div class="page" id="page-executive">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div class="section-title" style="margin-bottom:0">Executive Overview</div>
+        <button class="export-btn"><span class="material-icons-round">file_download</span>Export Structure</button>
+      </div>
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead>
+              <tr><th>Executive Name</th><th>Territory</th><th>Targets</th><th>Achieved</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600">Arjun Mehta</td>
+                <td>Mumbai South</td>
+                <td>&#8377;51,000.00</td>
+                <td>&#8377;48,200.00</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Kavita Nair</td>
+                <td>Pune Central</td>
+                <td>&#8377;45,000.00</td>
+                <td>&#8377;43,800.00</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Rohit Verma</td>
+                <td>Delhi East</td>
+                <td>&#8377;62,000.00</td>
+                <td>&#8377;55,400.00</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Sneha Joshi</td>
+                <td>Nashik West</td>
+                <td>&#8377;38,000.00</td>
+                <td>&#8377;29,600.00</td>
+                <td><span class="status-badge inactive">Inactive</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Manoj Tiwari</td>
+                <td>Jaipur South</td>
+                <td>&#8377;41,000.00</td>
+                <td>&#8377;39,200.00</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Divya Rao</td>
+                <td>Bangalore North</td>
+                <td>&#8377;55,000.00</td>
+                <td>&#8377;52,100.00</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Sanjay Gupta</td>
+                <td>Nagpur Central</td>
+                <td>&#8377;35,000.00</td>
+                <td>&#8377;31,800.00</td>
+                <td><span class="status-badge active">Active</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Pooja Sharma</td>
+                <td>Hyderabad East</td>
+                <td>&#8377;47,000.00</td>
+                <td>&#8377;22,500.00</td>
+                <td><span class="status-badge inactive">Inactive</span></td>
+                <td><button class="action-btn" title="View"><span class="material-icons-round">visibility</span></button><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 4: Cash & Payouts (National Analytics) -->
+    <div class="page" id="page-cash">
+      <div class="section-title">National Analytics</div>
+      <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="kpi-card kpi-saffron">
+          <div class="kpi-label">Daily Revenue</div>
+          <div class="kpi-value">&#8377;55,500</div>
+          <div class="kpi-sub">Count Mn</div>
+          <span class="material-icons-round kpi-icon">currency_rupee</span>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label">Monthly Payouts</div>
+          <div class="kpi-value">&#8377;3,42,800</div>
+          <div class="kpi-sub">+9.4% growth</div>
+          <span class="material-icons-round kpi-icon">payments</span>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">Net Settlements</div>
+          <div class="kpi-value">&#8377;1,87,600</div>
+          <div class="kpi-sub">Processed today</div>
+          <span class="material-icons-round kpi-icon">account_balance</span>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Revenue Trends</span>
+            <button class="card-action">Jan - Dec</button>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartRevenueTrend"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Order Graphs</span>
+            <button class="card-action">This Year</button>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartOrderGraphs"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Top Categories</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartTopCategories"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Customer Cohorts</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartCohorts"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Service Ads</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:#6B7280">Active Campaigns</span><span style="font-size:14px;font-weight:700;color:#0B1E3D">24</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:#6B7280">Impressions Today</span><span style="font-size:14px;font-weight:700;color:#0B1E3D">45,600</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:#6B7280">Click Rate</span><span style="font-size:14px;font-weight:700;color:#10B981">3.8%</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#6B7280">Revenue from Ads</span><span style="font-size:14px;font-weight:700;color:#FF6B00">&#8377;12,340</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Online Subscriptions</span>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:#6B7280">Active Subscribers</span><span style="font-size:14px;font-weight:700;color:#0B1E3D">1,280</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:#6B7280">Monthly Revenue</span><span style="font-size:14px;font-weight:700;color:#0B1E3D">&#8377;2,56,000</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:12px;color:#6B7280">Churn Rate</span><span style="font-size:14px;font-weight:700;color:#EF4444">2.1%</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#6B7280">New Signups</span><span style="font-size:14px;font-weight:700;color:#10B981">+86</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 5: Credits & Bills -->
+    <div class="page" id="page-credits">
+      <div class="section-title">Revenue Reports</div>
+      <div class="tab-bar">
+        <div class="tab-item active">Deal Scopes</div>
+        <div class="tab-item">FL Sports</div>
+        <div class="tab-item">Finder Subscribers</div>
+        <div class="tab-item">Route After</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Revenue by Category</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartRevCategory"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Color Shapes &amp; Asset Filters</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartAssetFilters"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <span class="card-title">Event Support</span>
+          <button class="card-action">View All</button>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+            <div style="background:#F5F6FA;border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:#0B1E3D">156</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px">Events Hosted</div>
+            </div>
+            <div style="background:#F5F6FA;border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:#FF6B00">&#8377;4.2L</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px">Event Revenue</div>
+            </div>
+            <div style="background:#F5F6FA;border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:#10B981">89%</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px">Satisfaction</div>
+            </div>
+            <div style="background:#F5F6FA;border-radius:10px;padding:16px;text-align:center">
+              <div style="font-size:22px;font-weight:800;color:#3B82F6">12</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px">Upcoming</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Audit Logs</span>
+          <button class="card-action">Download</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Timestamp</th><th>Action</th><th>User</th><th>Details</th></tr></thead>
+            <tbody>
+              <tr><td style="font-size:11px;color:#6B7280">2026-02-18 14:32</td><td>Invoice Generated</td><td>System</td><td>Invoice #INV-2890 for &#8377;12,400</td></tr>
+              <tr><td style="font-size:11px;color:#6B7280">2026-02-18 13:15</td><td>Payment Received</td><td>Rajesh Patil</td><td>&#8377;45,200 via NEFT</td></tr>
+              <tr><td style="font-size:11px;color:#6B7280">2026-02-18 11:45</td><td>Credit Applied</td><td>Admin</td><td>&#8377;5,000 credit to GoBharat Nashik</td></tr>
+              <tr><td style="font-size:11px;color:#6B7280">2026-02-18 10:20</td><td>Bill Generated</td><td>System</td><td>Monthly bill for 8 franchises</td></tr>
+              <tr><td style="font-size:11px;color:#6B7280">2026-02-17 18:30</td><td>Refund Processed</td><td>Kavita Nair</td><td>Order #ORD-4521 refund &#8377;890</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 6: Commissions -->
+    <div class="page" id="page-commissions">
+      <div class="section-title">Commission Management</div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Commission Rules</span>
+            <button class="btn btn-primary btn-sm"><span class="material-icons-round" style="font-size:14px">save</span>Save Changes</button>
+          </div>
+          <div class="card-body">
+            <div class="commission-rule">
+              <span class="commission-rule-label">Franchise Share</span>
+              <div class="commission-rule-right">
+                <input type="text" class="form-input-sm" value="55%">
+                <span class="status-badge approve">Approve</span>
+                <button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button>
+              </div>
+            </div>
+            <div class="commission-rule">
+              <span class="commission-rule-label">Platform Share</span>
+              <div class="commission-rule-right">
+                <input type="text" class="form-input-sm" value="55%">
+                <span class="status-badge approve">Approve</span>
+                <button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button>
+              </div>
+            </div>
+            <div class="commission-rule">
+              <span class="commission-rule-label">Executive Share</span>
+              <div class="commission-rule-right">
+                <input type="text" class="form-input-sm" value="56%">
+                <span class="status-badge approve">Approve</span>
+                <button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button>
+              </div>
+            </div>
+            <div class="commission-rule">
+              <span class="commission-rule-label">Affiliator Share</span>
+              <div class="commission-rule-right">
+                <input type="text" class="form-input-sm" value="86%">
+                <span class="status-badge suspended">Suspended</span>
+                <button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Commission Distribution</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartCommission"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <span class="card-title">Payout Queue</span>
+          <button class="card-action">Last 50 Invoices</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Payout Rotation</th><th>Franchise Name</th><th>Amount</th><th>Last Payout</th><th>Status</th><th>Updating</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>Weekly - Cycle 12</td>
+                <td style="font-weight:600">GoBharat Mumbai</td>
+                <td>&#8377;1,23,400</td>
+                <td style="font-size:11px;color:#6B7280">2026-02-15</td>
+                <td><span class="status-badge active">Paid</span></td>
+                <td><button class="action-btn"><span class="material-icons-round">refresh</span></button></td>
+              </tr>
+              <tr>
+                <td>Weekly - Cycle 12</td>
+                <td style="font-weight:600">GoBharat Pune</td>
+                <td>&#8377;89,200</td>
+                <td style="font-size:11px;color:#6B7280">2026-02-15</td>
+                <td><span class="status-badge active">Paid</span></td>
+                <td><button class="action-btn"><span class="material-icons-round">refresh</span></button></td>
+              </tr>
+              <tr>
+                <td>Weekly - Cycle 12</td>
+                <td style="font-weight:600">GoBharat Delhi NCR</td>
+                <td>&#8377;1,05,600</td>
+                <td style="font-size:11px;color:#6B7280">2026-02-14</td>
+                <td><span class="status-badge pending">Pending</span></td>
+                <td><button class="action-btn"><span class="material-icons-round">refresh</span></button></td>
+              </tr>
+              <tr>
+                <td>Weekly - Cycle 12</td>
+                <td style="font-weight:600">GoBharat Nashik</td>
+                <td>&#8377;56,800</td>
+                <td style="font-size:11px;color:#6B7280">2026-02-14</td>
+                <td><span class="status-badge pending">Pending</span></td>
+                <td><button class="action-btn"><span class="material-icons-round">refresh</span></button></td>
+              </tr>
+              <tr>
+                <td>Weekly - Cycle 11</td>
+                <td style="font-weight:600">GoBharat Nagpur</td>
+                <td>&#8377;34,500</td>
+                <td style="font-size:11px;color:#6B7280">2026-02-08</td>
+                <td><span class="status-badge active">Paid</span></td>
+                <td><button class="action-btn"><span class="material-icons-round">refresh</span></button></td>
+              </tr>
+              <tr>
+                <td>Weekly - Cycle 11</td>
+                <td style="font-weight:600">GoBharat Jaipur</td>
+                <td>&#8377;28,900</td>
+                <td style="font-size:11px;color:#6B7280">2026-02-08</td>
+                <td><span class="status-badge inactive">Suspended</span></td>
+                <td><button class="action-btn"><span class="material-icons-round">refresh</span></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 7: Ads & Reels -->
+    <div class="page" id="page-ads">
+      <div class="section-title">Ads & Reels Management</div>
+      <div class="tab-bar">
+        <div class="tab-item active" onclick="showAdTab('sponsored')">Sponsored Ads</div>
+        <div class="tab-item" onclick="showAdTab('reels')">Reels Campaigns</div>
+      </div>
+
+      <div id="adTabSponsored">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <span class="card-title">Active Ads</span>
+            <button class="export-btn"><span class="material-icons-round">add</span>New Ad</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>S.No</th><th>Vendor</th><th>Commission</th><th>Type</th><th>Duration / Imp</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td style="font-weight:600">Annu Juice Ondar</td>
+                  <td>12%</td>
+                  <td>Banner</td>
+                  <td>30 Days / 45K</td>
+                  <td>&#8377;8,500</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td style="font-weight:600">Zound India Guesagen</td>
+                  <td>15%</td>
+                  <td>Video</td>
+                  <td>15 Days / 32K</td>
+                  <td>&#8377;12,000</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td style="font-weight:600">Lavishines Village</td>
+                  <td>10%</td>
+                  <td>Carousel</td>
+                  <td>7 Days / 18K</td>
+                  <td>&#8377;4,200</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td style="font-weight:600">Sharma Electronics</td>
+                  <td>8%</td>
+                  <td>Banner</td>
+                  <td>30 Days / 56K</td>
+                  <td>&#8377;6,800</td>
+                  <td><span class="status-badge pending">Pending</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td style="font-weight:600">Patil Groceries</td>
+                  <td>11%</td>
+                  <td>Video</td>
+                  <td>14 Days / 22K</td>
+                  <td>&#8377;9,500</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td style="font-weight:600">Royal Fashions Hub</td>
+                  <td>14%</td>
+                  <td>Carousel</td>
+                  <td>21 Days / 38K</td>
+                  <td>&#8377;11,200</td>
+                  <td><span class="status-badge inactive">Expired</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="adTabReels" style="display:none">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <span class="card-title">Top Reels</span>
+            <button class="export-btn"><span class="material-icons-round">add</span>New Campaign</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>S.No</th><th>Source</th><th>Views</th><th>Description / Route</th><th>Duration</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td style="font-weight:600">Spice Kitchen Nashik</td>
+                  <td>12,400</td>
+                  <td>New Menu Launch Promo</td>
+                  <td>0:45</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td style="font-weight:600">Fashion Hub Mumbai</td>
+                  <td>8,920</td>
+                  <td>Summer Collection 2026</td>
+                  <td>1:20</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td style="font-weight:600">TechZone Pune</td>
+                  <td>6,540</td>
+                  <td>Gadget Deals Weekend</td>
+                  <td>0:30</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td style="font-weight:600">Fresh Mart Delhi</td>
+                  <td>15,300</td>
+                  <td>Farm Fresh Vegetables</td>
+                  <td>0:55</td>
+                  <td><span class="status-badge pending">Review</span></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td style="font-weight:600">Beauty Glow Jaipur</td>
+                  <td>4,230</td>
+                  <td>Skincare Essentials</td>
+                  <td>1:10</td>
+                  <td><span class="status-badge active">Live</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 8: Reports & Logs -->
+    <div class="page" id="page-reports">
+      <div class="section-title">Reports & Logs</div>
+      <div class="tab-bar">
+        <div class="tab-item active">Sessions And Costs</div>
+        <div class="tab-item">System Health</div>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header">
+          <span class="card-title">Generate Reports</span>
+        </div>
+        <div class="card-body">
+          <div class="report-item">
+            <div class="report-item-left">
+              <div class="report-icon"><span class="material-icons-round">receipt_long</span></div>
+              <div>
+                <div class="report-name">Order Report</div>
+                <div class="report-desc">Complete order history with delivery status</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm"><span class="material-icons-round" style="font-size:14px">file_download</span>Download</button>
+          </div>
+          <div class="report-item">
+            <div class="report-item-left">
+              <div class="report-icon" style="background:linear-gradient(135deg,#10B981,#34D399)"><span class="material-icons-round">trending_up</span></div>
+              <div>
+                <div class="report-name">Revenue Report</div>
+                <div class="report-desc">Monthly and yearly revenue breakdown</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm"><span class="material-icons-round" style="font-size:14px">file_download</span>Download</button>
+          </div>
+          <div class="report-item">
+            <div class="report-item-left">
+              <div class="report-icon" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)"><span class="material-icons-round">business</span></div>
+              <div>
+                <div class="report-name">Franchise Report</div>
+                <div class="report-desc">Performance metrics across all franchises</div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm"><span class="material-icons-round" style="font-size:14px">file_download</span>Download</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Panel Logs</span>
+            <button class="card-action">Refresh</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Timestamp</th><th>Event</th><th>Level</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="font-size:11px;color:#6B7280">2026-02-18 15:42:18</td>
+                  <td>Panneline Alsaages - Dashboard metrics refreshed</td>
+                  <td><span class="status-badge active">Info</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:11px;color:#6B7280">2026-02-18 15:38:05</td>
+                  <td>Meantime Operations - Batch payout processing initiated</td>
+                  <td><span class="status-badge new">Process</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:11px;color:#6B7280">2026-02-18 15:30:12</td>
+                  <td>Meantime Conditions - Franchise sync completed</td>
+                  <td><span class="status-badge active">Info</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:11px;color:#6B7280">2026-02-18 15:22:45</td>
+                  <td>Panneline Alsaages - User session audit complete</td>
+                  <td><span class="status-badge active">Info</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:11px;color:#6B7280">2026-02-18 15:15:33</td>
+                  <td>Meantime Operations - Commission calculations updated</td>
+                  <td><span class="status-badge new">Process</span></td>
+                </tr>
+                <tr>
+                  <td style="font-size:11px;color:#6B7280">2026-02-18 14:58:20</td>
+                  <td>Meantime Conditions - Database backup successful</td>
+                  <td><span class="status-badge active">Info</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Audit Logs</span>
+            <button class="card-action">Export</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Category</th><th>Details</th><th>Time</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:600">Quotes Specials</td>
+                  <td>Seasonal discount rules applied to 12 vendors</td>
+                  <td style="font-size:11px;color:#6B7280">14:45</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Review Report</td>
+                  <td>Weekly vendor performance review generated</td>
+                  <td style="font-size:11px;color:#6B7280">13:30</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Restore Info</td>
+                  <td>Franchise data restoration completed for Malegaon</td>
+                  <td style="font-size:11px;color:#6B7280">12:15</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Surtacs Output</td>
+                  <td>Tax calculation module updated for Q4 FY2026</td>
+                  <td style="font-size:11px;color:#6B7280">11:00</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Quotes Specials</td>
+                  <td>New promotional rate card for Diwali campaign</td>
+                  <td style="font-size:11px;color:#6B7280">10:20</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:600">Review Report</td>
+                  <td>Executive target completion analysis published</td>
+                  <td style="font-size:11px;color:#6B7280">09:45</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Team Management -->
+    <div class="page" id="page-team">
+      <div class="kpi-row">
+        <div class="kpi-card kpi-saffron">
+          <div class="kpi-label">Total Vendors</div>
+          <div class="kpi-value">512</div>
+          <div class="kpi-sub">+18 this week</div>
+          <span class="material-icons-round kpi-icon">store</span>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label">Franchise Owners</div>
+          <div class="kpi-value">8</div>
+          <div class="kpi-sub">All active</div>
+          <span class="material-icons-round kpi-icon">business</span>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">Marketing Execs</div>
+          <div class="kpi-value">24</div>
+          <div class="kpi-sub">+3 this month</div>
+          <span class="material-icons-round kpi-icon">campaign</span>
+        </div>
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-label">Delivery Boys</div>
+          <div class="kpi-value">180</div>
+          <div class="kpi-sub">156 online now</div>
+          <span class="material-icons-round kpi-icon">delivery_dining</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+        <div class="section-title" style="margin-bottom:0">All Team Members</div>
+        <button class="btn btn-primary" onclick="openTeamModal()"><span class="material-icons-round" style="font-size:16px">person_add</span>Add Team Member</button>
+      </div>
+
+      <div class="tab-bar" id="teamTabs">
+        <div class="tab-item active" onclick="filterTeam('all',this)">All</div>
+        <div class="tab-item" onclick="filterTeam('vendor',this)">Vendors</div>
+        <div class="tab-item" onclick="filterTeam('franchise',this)">Franchise</div>
+        <div class="tab-item" onclick="filterTeam('marketing',this)">Marketing</div>
+        <div class="tab-item" onclick="filterTeam('delivery',this)">Delivery</div>
+      </div>
+
+      <div class="card">
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Name</th><th>Role</th><th>Phone</th><th>Territory/City</th><th>Status</th><th>Date Added</th><th>Actions</th></tr></thead>
+            <tbody id="teamTableBody">
+              <tr data-role="vendor"><td style="font-weight:600">Annu Juice Centre</td><td><span class="status-badge new">Vendor</span></td><td>+91 98234 56789</td><td>Malegaon</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2026-01-15</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="vendor"><td style="font-weight:600">Sharma Electronics</td><td><span class="status-badge new">Vendor</span></td><td>+91 87654 32109</td><td>Nashik</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2026-01-20</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="vendor"><td style="font-weight:600">Royal Fashions Hub</td><td><span class="status-badge new">Vendor</span></td><td>+91 99887 66543</td><td>Pune</td><td><span class="status-badge inactive">Inactive</span></td><td style="font-size:11px;color:#6B7280">2025-12-10</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="vendor"><td style="font-weight:600">Patil Groceries</td><td><span class="status-badge new">Vendor</span></td><td>+91 77665 44321</td><td>Mumbai</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2026-02-01</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="franchise"><td style="font-weight:600">Rajesh Patil</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Franchise</span></td><td>+91 98765 43210</td><td>Malegaon</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2025-06-01</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="franchise"><td style="font-weight:600">Sunil Deshmukh</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Franchise</span></td><td>+91 91234 56780</td><td>Nashik</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2025-07-15</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="franchise"><td style="font-weight:600">Amit Kulkarni</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Franchise</span></td><td>+91 88776 65544</td><td>Pune</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2025-08-20</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="marketing"><td style="font-weight:600">Arjun Mehta</td><td><span class="status-badge" style="background:#EBF5FF;color:#3B82F6">Marketing</span></td><td>+91 95432 10987</td><td>Mumbai South</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2025-09-10</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="marketing"><td style="font-weight:600">Kavita Nair</td><td><span class="status-badge" style="background:#EBF5FF;color:#3B82F6">Marketing</span></td><td>+91 86543 21098</td><td>Pune Central</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2025-10-05</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="marketing"><td style="font-weight:600">Rohit Verma</td><td><span class="status-badge" style="background:#EBF5FF;color:#3B82F6">Marketing</span></td><td>+91 77654 32109</td><td>Delhi East</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2025-11-12</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="delivery"><td style="font-weight:600">Ravi Kumar</td><td><span class="status-badge" style="background:#F3E8FF;color:#8B5CF6">Delivery</span></td><td>+91 66543 21098</td><td>Malegaon</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2026-01-05</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="delivery"><td style="font-weight:600">Suresh Yadav</td><td><span class="status-badge" style="background:#F3E8FF;color:#8B5CF6">Delivery</span></td><td>+91 55432 10987</td><td>Nashik</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">2026-01-18</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr data-role="delivery"><td style="font-weight:600">Manoj Shinde</td><td><span class="status-badge" style="background:#F3E8FF;color:#8B5CF6">Delivery</span></td><td>+91 44321 09876</td><td>Pune</td><td><span class="status-badge inactive">Inactive</span></td><td style="font-size:11px;color:#6B7280">2025-12-22</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: User Activity -->
+    <div class="page" id="page-activity">
+      <div class="kpi-row">
+        <div class="kpi-card kpi-green">
+          <div class="kpi-label">Active Users Now</div>
+          <div class="kpi-value">342</div>
+          <div class="kpi-sub">+28 in last hour</div>
+          <span class="material-icons-round kpi-icon">person</span>
+        </div>
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-label">Avg Session Time</div>
+          <div class="kpi-value">8.5 min</div>
+          <div class="kpi-sub">+1.2 min vs yesterday</div>
+          <span class="material-icons-round kpi-icon">timer</span>
+        </div>
+        <div class="kpi-card kpi-saffron">
+          <div class="kpi-label">Screen Views Today</div>
+          <div class="kpi-value">12,480</div>
+          <div class="kpi-sub">+15.3% vs yesterday</div>
+          <span class="material-icons-round kpi-icon">visibility</span>
+        </div>
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-label">Vendors Online</div>
+          <div class="kpi-value">86</div>
+          <div class="kpi-sub">Out of 512 total</div>
+          <span class="material-icons-round kpi-icon">storefront</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <span class="card-title">Live User Activity</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#10B981;font-weight:600"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Live</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>User Name</th><th>Role</th><th>Current Location</th><th>Last Active</th><th>Current Screen</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">Aarav Sharma</td><td><span class="status-badge new">Customer</span></td><td>Jama Masjid Road, Malegaon</td><td style="font-size:11px;color:#6B7280">Just now</td><td>Home</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+              <tr><td style="font-weight:600">Priya Patil</td><td><span class="status-badge new">Customer</span></td><td>Station Road, Malegaon</td><td style="font-size:11px;color:#6B7280">2 min ago</td><td>Explore</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+              <tr><td style="font-weight:600">Rahul Deshmukh</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Vendor</span></td><td>Satana Naka, Malegaon</td><td style="font-size:11px;color:#6B7280">Just now</td><td>Product Detail</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+              <tr><td style="font-weight:600">Sneha Jadhav</td><td><span class="status-badge new">Customer</span></td><td>Camp Area, Malegaon</td><td style="font-size:11px;color:#6B7280">5 min ago</td><td>Cart</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#F59E0B"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>Away</span></td></tr>
+              <tr><td style="font-weight:600">Vikram Singh</td><td><span class="status-badge" style="background:#F3E8FF;color:#8B5CF6">Delivery</span></td><td>Mhasrul Road, Malegaon</td><td style="font-size:11px;color:#6B7280">Just now</td><td>Orders</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+              <tr><td style="font-weight:600">Anjali Kulkarni</td><td><span class="status-badge new">Customer</span></td><td>Bhadgaon Road, Malegaon</td><td style="font-size:11px;color:#6B7280">8 min ago</td><td>Profile</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#9CA3AF"><span style="width:8px;height:8px;border-radius:50%;background:#9CA3AF;display:inline-block"></span>Offline</span></td></tr>
+              <tr><td style="font-weight:600">Deepak Rathore</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Vendor</span></td><td>Shivaji Chowk, Malegaon</td><td style="font-size:11px;color:#6B7280">1 min ago</td><td>Home</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+              <tr><td style="font-weight:600">Manish Bhosle</td><td><span class="status-badge" style="background:#F3E8FF;color:#8B5CF6">Delivery</span></td><td>Dargah Road, Malegaon</td><td style="font-size:11px;color:#6B7280">3 min ago</td><td>Explore</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+              <tr><td style="font-weight:600">Pooja Wagh</td><td><span class="status-badge new">Customer</span></td><td>Collector Office Road, Malegaon</td><td style="font-size:11px;color:#6B7280">12 min ago</td><td>Reels</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#9CA3AF"><span style="width:8px;height:8px;border-radius:50%;background:#9CA3AF;display:inline-block"></span>Offline</span></td></tr>
+              <tr><td style="font-weight:600">Sanjay Gupta</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Vendor</span></td><td>Sambhaji Nagar, Malegaon</td><td style="font-size:11px;color:#6B7280">Just now</td><td>Product Detail</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Most Visited Screens</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="chartScreenVisits"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Vendor Activity</span>
+          </div>
+          <div class="card-body" style="padding:0">
+            <table>
+              <thead><tr><th>Vendor Name</th><th>Products Viewed</th><th>Orders Received</th><th>Last Location</th><th>Online Hrs</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:600">Annu Juice Centre</td><td>45</td><td>12</td><td>Jama Masjid Road</td><td>6.2h</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+                <tr><td style="font-weight:600">Sharma Electronics</td><td>89</td><td>8</td><td>Station Road</td><td>4.8h</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+                <tr><td style="font-weight:600">Patil Groceries</td><td>32</td><td>18</td><td>Camp Area</td><td>7.1h</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#F59E0B"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block"></span>Away</span></td></tr>
+                <tr><td style="font-weight:600">Royal Fashions Hub</td><td>67</td><td>5</td><td>Shivaji Chowk</td><td>3.5h</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#9CA3AF"><span style="width:8px;height:8px;border-radius:50%;background:#9CA3AF;display:inline-block"></span>Offline</span></td></tr>
+                <tr><td style="font-weight:600">Fresh Mart</td><td>54</td><td>22</td><td>Satana Naka</td><td>8.0h</td><td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#10B981"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block"></span>Online</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <div class="card-header">
+          <span class="card-title">Click Heatmap - Most Clicked Areas</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Screen</th><th>Element</th><th>Click Count</th><th>Avg Time Spent</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">Home</td><td>Search Bar</td><td>4,520</td><td>12s</td></tr>
+              <tr><td style="font-weight:600">Home</td><td>Category Carousel</td><td>3,890</td><td>8s</td></tr>
+              <tr><td style="font-weight:600">Explore</td><td>Filter Button</td><td>2,340</td><td>15s</td></tr>
+              <tr><td style="font-weight:600">Product Detail</td><td>Add to Cart</td><td>1,980</td><td>5s</td></tr>
+              <tr><td style="font-weight:600">Cart</td><td>Checkout Button</td><td>1,450</td><td>3s</td></tr>
+              <tr><td style="font-weight:600">Profile</td><td>Order History</td><td>1,120</td><td>22s</td></tr>
+              <tr><td style="font-weight:600">Reels</td><td>Like Button</td><td>6,780</td><td>2s</td></tr>
+              <tr><td style="font-weight:600">Reels</td><td>Share Button</td><td>2,150</td><td>4s</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Access Control -->
+    <div class="page" id="page-access">
+      <div style="background:#EBF5FF;border:1px solid #93C5FD;border-radius:10px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+        <span class="material-icons-round" style="color:#3B82F6;font-size:24px">info</span>
+        <span style="font-size:13px;color:#1E40AF;font-weight:500">Approved users can view the admin panel in read-only mode. They cannot edit or change any data.</span>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <span class="card-title">Add Phone Number</span>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:14px;align-items:end">
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Phone Number (+91)</label>
+              <input type="text" class="form-input" id="accessPhone" placeholder="+91 XXXXX XXXXX">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-input" id="accessName" placeholder="Enter name">
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="form-label">Access Level</label>
+              <select class="form-input" id="accessLevel">
+                <option value="view_only">View Only</option>
+                <option value="limited_analytics">Limited Analytics</option>
+                <option value="full_view">Full View</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="addAccessNumber()" style="height:38px"><span class="material-icons-round" style="font-size:16px">add</span>Add</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-header">
+          <span class="card-title">Approved Numbers</span>
+          <span style="font-size:12px;color:#6B7280">6 approved</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Phone Number</th><th>Name</th><th>Access Level</th><th>Approved Date</th><th>Last Login</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="accessTableBody">
+              <tr><td style="font-weight:600">+91 98765 43210</td><td>Rajesh Patil</td><td><span class="status-badge new">Full View</span></td><td style="font-size:11px;color:#6B7280">2026-01-10</td><td style="font-size:11px;color:#6B7280">2026-02-18 14:30</td><td><span class="status-badge active">Active</span></td><td><button class="btn btn-danger btn-sm" onclick="revokeAccess(this)">Revoke</button><button class="action-btn danger" title="Delete" style="margin-left:4px"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr><td style="font-weight:600">+91 91234 56780</td><td>Sunil Deshmukh</td><td><span class="status-badge new">Full View</span></td><td style="font-size:11px;color:#6B7280">2026-01-12</td><td style="font-size:11px;color:#6B7280">2026-02-17 09:15</td><td><span class="status-badge active">Active</span></td><td><button class="btn btn-danger btn-sm" onclick="revokeAccess(this)">Revoke</button><button class="action-btn danger" title="Delete" style="margin-left:4px"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr><td style="font-weight:600">+91 88776 65544</td><td>Amit Kulkarni</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Limited Analytics</span></td><td style="font-size:11px;color:#6B7280">2026-01-20</td><td style="font-size:11px;color:#6B7280">2026-02-16 18:45</td><td><span class="status-badge active">Active</span></td><td><button class="btn btn-danger btn-sm" onclick="revokeAccess(this)">Revoke</button><button class="action-btn danger" title="Delete" style="margin-left:4px"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr><td style="font-weight:600">+91 77665 44321</td><td>Priya Sharma</td><td><span class="status-badge" style="background:#E6FFF5;color:#10B981">View Only</span></td><td style="font-size:11px;color:#6B7280">2026-02-01</td><td style="font-size:11px;color:#6B7280">2026-02-18 11:20</td><td><span class="status-badge active">Active</span></td><td><button class="btn btn-danger btn-sm" onclick="revokeAccess(this)">Revoke</button><button class="action-btn danger" title="Delete" style="margin-left:4px"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr><td style="font-weight:600">+91 66543 21098</td><td>Vikram Singh</td><td><span class="status-badge new">Full View</span></td><td style="font-size:11px;color:#6B7280">2026-02-05</td><td style="font-size:11px;color:#6B7280">2026-02-15 16:30</td><td><span class="status-badge inactive">Revoked</span></td><td><button class="btn btn-success btn-sm" onclick="restoreAccess(this)">Restore</button><button class="action-btn danger" title="Delete" style="margin-left:4px"><span class="material-icons-round">delete</span></button></td></tr>
+              <tr><td style="font-weight:600">+91 55432 10987</td><td>Deepak Rathore</td><td><span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Limited Analytics</span></td><td style="font-size:11px;color:#6B7280">2026-02-08</td><td style="font-size:11px;color:#6B7280">2026-02-18 08:00</td><td><span class="status-badge active">Active</span></td><td><button class="btn btn-danger btn-sm" onclick="revokeAccess(this)">Revoke</button><button class="action-btn danger" title="Delete" style="margin-left:4px"><span class="material-icons-round">delete</span></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Access Logs</span>
+          <button class="card-action">Refresh</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead><tr><th>Phone</th><th>Time</th><th>IP Address</th><th>Status</th><th>Device</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">+91 98765 43210</td><td style="font-size:11px;color:#6B7280">2026-02-18 14:30:12</td><td>192.168.1.45</td><td><span class="status-badge active">Allowed</span></td><td>Android - Chrome</td></tr>
+              <tr><td style="font-weight:600">+91 91234 56780</td><td style="font-size:11px;color:#6B7280">2026-02-18 13:15:08</td><td>103.42.56.78</td><td><span class="status-badge active">Allowed</span></td><td>iOS - Safari</td></tr>
+              <tr><td style="font-weight:600">+91 99887 11223</td><td style="font-size:11px;color:#6B7280">2026-02-18 12:45:33</td><td>45.67.89.12</td><td><span class="status-badge inactive">Denied</span></td><td>Windows - Firefox</td></tr>
+              <tr><td style="font-weight:600">+91 88776 65544</td><td style="font-size:11px;color:#6B7280">2026-02-18 11:20:55</td><td>172.16.0.23</td><td><span class="status-badge active">Allowed</span></td><td>Android - Chrome</td></tr>
+              <tr><td style="font-weight:600">+91 44556 77889</td><td style="font-size:11px;color:#6B7280">2026-02-18 10:05:19</td><td>78.90.12.34</td><td><span class="status-badge inactive">Denied</span></td><td>Android - Chrome</td></tr>
+              <tr><td style="font-weight:600">+91 77665 44321</td><td style="font-size:11px;color:#6B7280">2026-02-18 09:30:41</td><td>10.0.0.15</td><td><span class="status-badge active">Allowed</span></td><td>iOS - Safari</td></tr>
+              <tr><td style="font-weight:600">+91 66543 21098</td><td style="font-size:11px;color:#6B7280">2026-02-18 08:15:27</td><td>192.168.2.88</td><td><span class="status-badge inactive">Denied</span></td><td>Windows - Edge</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Team Member Modal -->
+<div class="modal-overlay" id="modal-addTeam">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-header">
+      <h3 class="modal-title">Add Team Member</h3>
+      <button class="modal-close" onclick="closeTeamModal()"><span class="material-icons-round">close</span></button>
+    </div>
+    <div class="modal-body">
+      <div id="teamRoleSelector">
+        <p style="font-size:13px;color:#6B7280;margin-bottom:14px">Select the role of the team member:</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div onclick="selectTeamRole('vendor')" style="border:2px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .2s" class="role-card" data-role="vendor">
+            <span class="material-icons-round" style="font-size:32px;color:#FF6B00;margin-bottom:6px">store</span>
+            <div style="font-size:14px;font-weight:700;color:#0B1E3D">Vendor</div>
+            <div style="font-size:11px;color:#9CA3AF">Business partner</div>
+          </div>
+          <div onclick="selectTeamRole('franchise')" style="border:2px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .2s" class="role-card" data-role="franchise">
+            <span class="material-icons-round" style="font-size:32px;color:#3B82F6;margin-bottom:6px">business</span>
+            <div style="font-size:14px;font-weight:700;color:#0B1E3D">Franchise Owner</div>
+            <div style="font-size:11px;color:#9CA3AF">City franchise</div>
+          </div>
+          <div onclick="selectTeamRole('marketing')" style="border:2px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .2s" class="role-card" data-role="marketing">
+            <span class="material-icons-round" style="font-size:32px;color:#10B981;margin-bottom:6px">campaign</span>
+            <div style="font-size:14px;font-weight:700;color:#0B1E3D">Marketing Executive</div>
+            <div style="font-size:11px;color:#9CA3AF">Field marketing</div>
+          </div>
+          <div onclick="selectTeamRole('delivery')" style="border:2px solid #E5E7EB;border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .2s" class="role-card" data-role="delivery">
+            <span class="material-icons-round" style="font-size:32px;color:#8B5CF6;margin-bottom:6px">delivery_dining</span>
+            <div style="font-size:14px;font-weight:700;color:#0B1E3D">Delivery Boy</div>
+            <div style="font-size:11px;color:#9CA3AF">Last mile delivery</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="teamForm" style="display:none">
+        <button class="btn btn-secondary btn-sm" onclick="backToRoleSelector()" style="margin-bottom:14px"><span class="material-icons-round" style="font-size:14px">arrow_back</span>Back</button>
+        <div id="teamFormTitle" style="font-size:15px;font-weight:700;color:#0B1E3D;margin-bottom:16px"></div>
+
+        <div id="field-businessName" class="form-group"><label class="form-label">Business Name</label><input type="text" class="form-input" placeholder="Enter business name"></div>
+        <div id="field-ownerName" class="form-group"><label class="form-label">Owner Name</label><input type="text" class="form-input" placeholder="Enter owner name"></div>
+        <div id="field-name" class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input" placeholder="Enter full name"></div>
+        <div id="field-phone" class="form-group"><label class="form-label">Phone Number</label><input type="text" class="form-input" placeholder="+91 XXXXX XXXXX"></div>
+        <div id="field-email" class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-input" placeholder="Enter email"></div>
+        <div id="field-category" class="form-group"><label class="form-label">Category</label><select class="form-input"><option value="">Select Category</option><option>B2B</option><option>B2C</option><option>Service</option><option>Manpower</option></select></div>
+        <div id="field-commission" class="form-group"><label class="form-label">Commission Rate (%)</label><input type="number" class="form-input" placeholder="e.g. 12"></div>
+        <div id="field-address" class="form-group"><label class="form-label">Address</label><input type="text" class="form-input" placeholder="Enter full address"></div>
+        <div id="field-city" class="form-group"><label class="form-label">City / Territory</label><select class="form-input"><option value="">Select City</option><option>Malegaon</option><option>Nashik</option><option>Pune</option><option>Mumbai</option><option>Delhi NCR</option><option>Jaipur</option><option>Nagpur</option><option>Aurangabad</option><option>Kolhapur</option><option>Solapur</option><option>Hyderabad</option><option>Bangalore</option></select></div>
+        <div id="field-territory" class="form-group"><label class="form-label">Territory</label><select class="form-input"><option value="">Select Territory</option><option>Malegaon</option><option>Nashik</option><option>Pune</option><option>Mumbai</option><option>Delhi NCR</option><option>Jaipur</option><option>Nagpur</option><option>Aurangabad</option><option>Kolhapur</option><option>Solapur</option><option>Hyderabad</option><option>Bangalore</option></select></div>
+        <div id="field-bankName" class="form-group"><label class="form-label">Bank Name</label><input type="text" class="form-input" placeholder="Enter bank name"></div>
+        <div id="field-accountNumber" class="form-group"><label class="form-label">Account Number</label><input type="text" class="form-input" placeholder="Enter account number"></div>
+        <div id="field-ifscCode" class="form-group"><label class="form-label">IFSC Code</label><input type="text" class="form-input" placeholder="Enter IFSC code"></div>
+        <div id="field-accountHolder" class="form-group"><label class="form-label">Account Holder Name</label><input type="text" class="form-input" placeholder="Enter account holder name"></div>
+        <div id="field-targetAmount" class="form-group"><label class="form-label">Target Amount (&#8377;)</label><input type="number" class="form-input" placeholder="e.g. 50000"></div>
+        <div id="field-vehicleType" class="form-group"><label class="form-label">Vehicle Type</label><select class="form-input"><option value="">Select Vehicle</option><option>Bike</option><option>Scooter</option><option>Bicycle</option><option>Auto</option></select></div>
+        <div id="field-licenseNumber" class="form-group"><label class="form-label">License Number</label><input type="text" class="form-input" placeholder="Enter license number"></div>
+      </div>
+    </div>
+    <div class="modal-footer" id="teamModalFooter" style="display:none">
+      <button class="btn btn-secondary" onclick="closeTeamModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitTeamMember()"><span class="material-icons-round" style="font-size:14px">check</span>Add Member</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modalTitle">Details</h3>
+      <button class="modal-close" onclick="closeModal()"><span class="material-icons-round">close</span></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" id="modalSaveBtn" style="display:none">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const pageTitles = {
+  dashboard: 'City Overview',
+  franchise: 'Franchise Management',
+  executive: 'Executive Overview',
+  cash: 'National Analytics',
+  credits: 'Credits & Bills',
+  commissions: 'Commission Management',
+  ads: 'Ads & Reels',
+  reports: 'Reports & Logs',
+  team: 'Team Management',
+  activity: 'User Activity',
+  access: 'Access Control'
+};
+
+document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+  item.addEventListener('click', function() {
+    const page = this.getAttribute('data-page');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    this.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if (target) target.classList.add('active');
+    document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+    closeSidebar();
+    initChartsForPage(page);
+  });
+});
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlayBg').classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlayBg').classList.remove('show');
+}
+
+function openModal(title, content) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = content;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+function showAdTab(tab) {
+  document.getElementById('adTabSponsored').style.display = tab === 'sponsored' ? 'block' : 'none';
+  document.getElementById('adTabReels').style.display = tab === 'reels' ? 'block' : 'none';
+  const tabs = document.querySelectorAll('#page-ads .tab-item');
+  tabs.forEach(t => t.classList.remove('active'));
+  if (tab === 'sponsored') tabs[0].classList.add('active');
+  else tabs[1].classList.add('active');
+}
+
+const chartInstances = {};
+function destroyChart(id) {
+  if (chartInstances[id]) {
+    chartInstances[id].destroy();
+    delete chartInstances[id];
+  }
+}
+
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false } },
+  scales: {
+    x: { grid: { display: false }, ticks: { font: { family: 'Poppins', size: 11 }, color: '#9CA3AF' } },
+    y: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Poppins', size: 11 }, color: '#9CA3AF' } }
+  }
+};
+
+function initDashboardCharts() {
+  destroyChart('chartCustomers');
+  const ctx1 = document.getElementById('chartCustomers');
+  if (ctx1) {
+    chartInstances['chartCustomers'] = new Chart(ctx1, {
+      type: 'line',
+      data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        datasets: [{
+          label: 'Customers',
+          data: [1200,1800,1400,2200,2800,2400,3100,3500,3200,3800,4200,4600],
+          borderColor: '#FF6B00',
+          backgroundColor: 'rgba(255,107,0,0.08)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#FF6B00'
+        }]
+      },
+      options: { ...chartDefaults }
+    });
+  }
+
+  destroyChart('chartStateRevenue');
+  const ctx2 = document.getElementById('chartStateRevenue');
+  if (ctx2) {
+    chartInstances['chartStateRevenue'] = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Maharashtra','Delhi','Karnataka','Rajasthan','Telangana','Gujarat'],
+        datasets: [{
+          label: 'Revenue (L)',
+          data: [24.5,18.3,12.8,8.4,9.2,7.6],
+          backgroundColor: ['#FF6B00','#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444'],
+          borderRadius: 6,
+          barThickness: 28
+        }]
+      },
+      options: {
+        ...chartDefaults,
+        indexAxis: 'y',
+        scales: {
+          x: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Poppins', size: 11 }, color: '#9CA3AF' } },
+          y: { grid: { display: false }, ticks: { font: { family: 'Poppins', size: 11 }, color: '#374151' } }
+        }
+      }
+    });
+  }
+
+  destroyChart('chartPromotion');
+  const ctx3 = document.getElementById('chartPromotion');
+  if (ctx3) {
+    chartInstances['chartPromotion'] = new Chart(ctx3, {
+      type: 'doughnut',
+      data: {
+        labels: ['Coupons','Referrals','Ads','Organic'],
+        datasets: [{
+          data: [35,20,28,17],
+          backgroundColor: ['#FF6B00','#10B981','#3B82F6','#8B5CF6'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%',
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { font: { family: 'Poppins', size: 11 }, padding: 12, usePointStyle: true } }
+        }
+      }
+    });
+  }
+}
+
+function initCashCharts() {
+  destroyChart('chartRevenueTrend');
+  const ctx = document.getElementById('chartRevenueTrend');
+  if (ctx) {
+    chartInstances['chartRevenueTrend'] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        datasets: [{
+          label: 'Revenue',
+          data: [32000,38000,35000,42000,48000,45000,52000,58000,55000,62000,68000,72000],
+          borderColor: '#FF6B00',
+          backgroundColor: 'rgba(255,107,0,0.06)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#FF6B00'
+        },{
+          label: 'Expenses',
+          data: [18000,22000,20000,25000,28000,26000,30000,33000,31000,35000,38000,40000],
+          borderColor: '#3B82F6',
+          backgroundColor: 'rgba(59,130,246,0.06)',
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#3B82F6'
+        }]
+      },
+      options: {
+        ...chartDefaults,
+        plugins: { legend: { display: true, position: 'top', labels: { font: { family: 'Poppins', size: 11 }, usePointStyle: true } } }
+      }
+    });
+  }
+
+  destroyChart('chartOrderGraphs');
+  const ctx2 = document.getElementById('chartOrderGraphs');
+  if (ctx2) {
+    chartInstances['chartOrderGraphs'] = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        datasets: [{
+          label: 'Orders',
+          data: [420,580,510,690,780,720,850,920,880,1020,1100,1180],
+          backgroundColor: '#FF6B00',
+          borderRadius: 4,
+          barThickness: 16
+        }]
+      },
+      options: chartDefaults
+    });
+  }
+
+  destroyChart('chartTopCategories');
+  const ctx3 = document.getElementById('chartTopCategories');
+  if (ctx3) {
+    chartInstances['chartTopCategories'] = new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: ['Food & Dining','Electronics','Fashion','Groceries','Health & Beauty','Home'],
+        datasets: [{
+          label: 'Revenue',
+          data: [18.5,15.2,12.8,11.4,8.6,6.3],
+          backgroundColor: ['#FF6B00','#3B82F6','#8B5CF6','#10B981','#F59E0B','#EF4444'],
+          borderRadius: 6,
+          barThickness: 24
+        }]
+      },
+      options: {
+        ...chartDefaults,
+        indexAxis: 'y',
+        scales: {
+          x: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Poppins', size: 11 }, color: '#9CA3AF' } },
+          y: { grid: { display: false }, ticks: { font: { family: 'Poppins', size: 11 }, color: '#374151' } }
+        }
+      }
+    });
+  }
+
+  destroyChart('chartCohorts');
+  const ctx4 = document.getElementById('chartCohorts');
+  if (ctx4) {
+    chartInstances['chartCohorts'] = new Chart(ctx4, {
+      type: 'doughnut',
+      data: {
+        labels: ['New Users','Returning','Loyal','Dormant'],
+        datasets: [{
+          data: [30,35,25,10],
+          backgroundColor: ['#3B82F6','#10B981','#FF6B00','#9CA3AF'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { font: { family: 'Poppins', size: 11 }, padding: 12, usePointStyle: true } }
+        }
+      }
+    });
+  }
+}
+
+function initCreditsCharts() {
+  destroyChart('chartRevCategory');
+  const ctx = document.getElementById('chartRevCategory');
+  if (ctx) {
+    chartInstances['chartRevCategory'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Deal Scopes','FL Sports','Finder Sub','Route After','Events'],
+        datasets: [{
+          label: 'Revenue',
+          data: [45000,32000,28000,22000,18000],
+          backgroundColor: ['#FF6B00','#3B82F6','#10B981','#8B5CF6','#F59E0B'],
+          borderRadius: 6,
+          barThickness: 32
+        }]
+      },
+      options: chartDefaults
+    });
+  }
+
+  destroyChart('chartAssetFilters');
+  const ctx2 = document.getElementById('chartAssetFilters');
+  if (ctx2) {
+    chartInstances['chartAssetFilters'] = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: ['Color Shapes','Asset Filters','Event Support','Others'],
+        datasets: [{
+          data: [40,25,20,15],
+          backgroundColor: ['#FF6B00','#3B82F6','#10B981','#8B5CF6'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { font: { family: 'Poppins', size: 11 }, padding: 12, usePointStyle: true } }
+        }
+      }
+    });
+  }
+}
+
+function initCommissionCharts() {
+  destroyChart('chartCommission');
+  const ctx = document.getElementById('chartCommission');
+  if (ctx) {
+    chartInstances['chartCommission'] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Franchise (55%)','Platform (55%)','Executive (56%)','Affiliator (86%)'],
+        datasets: [{
+          data: [55,55,56,86],
+          backgroundColor: ['#FF6B00','#3B82F6','#10B981','#8B5CF6'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '55%',
+        plugins: {
+          legend: { display: true, position: 'bottom', labels: { font: { family: 'Poppins', size: 11 }, padding: 10, usePointStyle: true } }
+        }
+      }
+    });
+  }
+}
+
+function initChartsForPage(page) {
+  setTimeout(() => {
+    if (page === 'dashboard') initDashboardCharts();
+    else if (page === 'cash') initCashCharts();
+    else if (page === 'credits') initCreditsCharts();
+    else if (page === 'commissions') initCommissionCharts();
+    else if (page === 'activity') initActivityCharts();
+  }, 50);
+}
+
+// Team Management Functions
+let selectedTeamRole = '';
+const roleFields = {
+  vendor: ['businessName','ownerName','phone','email','category','commission','address','city'],
+  franchise: ['name','phone','email','city','territory','bankName','accountNumber','ifscCode','accountHolder'],
+  marketing: ['name','phone','email','city','territory','targetAmount'],
+  delivery: ['name','phone','email','city','vehicleType','licenseNumber']
+};
+const roleTitles = { vendor:'Add Vendor', franchise:'Add Franchise Owner', marketing:'Add Marketing Executive', delivery:'Add Delivery Boy' };
+const roleBadges = {
+  vendor: '<span class="status-badge new">Vendor</span>',
+  franchise: '<span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Franchise</span>',
+  marketing: '<span class="status-badge" style="background:#EBF5FF;color:#3B82F6">Marketing</span>',
+  delivery: '<span class="status-badge" style="background:#F3E8FF;color:#8B5CF6">Delivery</span>'
+};
+
+function openTeamModal() {
+  selectedTeamRole = '';
+  document.getElementById('teamRoleSelector').style.display = 'block';
+  document.getElementById('teamForm').style.display = 'none';
+  document.getElementById('teamModalFooter').style.display = 'none';
+  document.getElementById('modal-addTeam').classList.add('show');
+}
+function closeTeamModal() {
+  document.getElementById('modal-addTeam').classList.remove('show');
+}
+function selectTeamRole(role) {
+  selectedTeamRole = role;
+  document.getElementById('teamRoleSelector').style.display = 'none';
+  document.getElementById('teamForm').style.display = 'block';
+  document.getElementById('teamModalFooter').style.display = 'flex';
+  document.getElementById('teamFormTitle').textContent = roleTitles[role];
+  const allFields = ['businessName','ownerName','name','phone','email','category','commission','address','city','territory','bankName','accountNumber','ifscCode','accountHolder','targetAmount','vehicleType','licenseNumber'];
+  allFields.forEach(f => { document.getElementById('field-'+f).style.display = 'none'; });
+  roleFields[role].forEach(f => { document.getElementById('field-'+f).style.display = 'block'; });
+}
+function backToRoleSelector() {
+  document.getElementById('teamRoleSelector').style.display = 'block';
+  document.getElementById('teamForm').style.display = 'none';
+  document.getElementById('teamModalFooter').style.display = 'none';
+}
+function submitTeamMember() {
+  const fields = roleFields[selectedTeamRole];
+  let name = '', phone = '', city = '';
+  fields.forEach(f => {
+    const el = document.getElementById('field-'+f).querySelector('input,select');
+    if (f === 'businessName' || f === 'name' || f === 'ownerName') name = el.value || 'New Member';
+    if (f === 'phone') phone = el.value || '+91 00000 00000';
+    if (f === 'city' || f === 'territory') city = el.value || 'Malegaon';
+  });
+  if (!name) name = 'New Member';
+  const today = new Date().toISOString().slice(0,10);
+  const tr = document.createElement('tr');
+  tr.setAttribute('data-role', selectedTeamRole);
+  tr.innerHTML = '<td style="font-weight:600">'+name+'</td><td>'+roleBadges[selectedTeamRole]+'</td><td>'+phone+'</td><td>'+city+'</td><td><span class="status-badge active">Active</span></td><td style="font-size:11px;color:#6B7280">'+today+'</td><td><button class="action-btn" title="Edit"><span class="material-icons-round">edit</span></button><button class="action-btn danger" title="Delete"><span class="material-icons-round">delete</span></button></td>';
+  document.getElementById('teamTableBody').appendChild(tr);
+  closeTeamModal();
+}
+
+function filterTeam(role, el) {
+  document.querySelectorAll('#teamTabs .tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#teamTableBody tr').forEach(tr => {
+    if (role === 'all') tr.style.display = '';
+    else tr.style.display = tr.getAttribute('data-role') === role ? '' : 'none';
+  });
+}
+
+// Activity Charts
+function initActivityCharts() {
+  destroyChart('chartScreenVisits');
+  const ctx = document.getElementById('chartScreenVisits');
+  if (ctx) {
+    chartInstances['chartScreenVisits'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Home','Explore','Product Detail','Cart','Profile','Reels','Orders'],
+        datasets: [{
+          label: 'Visits',
+          data: [4520,3200,2890,1450,1120,6780,980],
+          backgroundColor: ['#FF6B00','#3B82F6','#10B981','#8B5CF6','#F59E0B','#EF4444','#06B6D4'],
+          borderRadius: 6,
+          barThickness: 28
+        }]
+      },
+      options: chartDefaults
+    });
+  }
+}
+
+// Access Control Functions
+function addAccessNumber() {
+  const phone = document.getElementById('accessPhone').value || '+91 00000 00000';
+  const name = document.getElementById('accessName').value || 'New User';
+  const level = document.getElementById('accessLevel');
+  const levelText = level.options[level.selectedIndex].text;
+  const today = new Date().toISOString().slice(0,10);
+  const levelBadge = level.value === 'full_view' ? '<span class="status-badge new">Full View</span>' : level.value === 'limited_analytics' ? '<span class="status-badge" style="background:#FEF3C7;color:#F59E0B">Limited Analytics</span>' : '<span class="status-badge" style="background:#E6FFF5;color:#10B981">View Only</span>';
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td style="font-weight:600">'+phone+'</td><td>'+name+'</td><td>'+levelBadge+'</td><td style="font-size:11px;color:#6B7280">'+today+'</td><td style="font-size:11px;color:#6B7280">Never</td><td><span class="status-badge active">Active</span></td><td><button class="btn btn-danger btn-sm" onclick="revokeAccess(this)">Revoke</button><button class="action-btn danger" title="Delete" style="margin-left:4px"><span class="material-icons-round">delete</span></button></td>';
+  document.getElementById('accessTableBody').appendChild(tr);
+  document.getElementById('accessPhone').value = '';
+  document.getElementById('accessName').value = '';
+}
+function revokeAccess(btn) {
+  const tr = btn.closest('tr');
+  const statusCell = tr.querySelector('td:nth-child(6)');
+  statusCell.innerHTML = '<span class="status-badge inactive">Revoked</span>';
+  btn.outerHTML = '<button class="btn btn-success btn-sm" onclick="restoreAccess(this)">Restore</button>';
+}
+function restoreAccess(btn) {
+  const tr = btn.closest('tr');
+  const statusCell = tr.querySelector('td:nth-child(6)');
+  statusCell.innerHTML = '<span class="status-badge active">Active</span>';
+  btn.outerHTML = '<button class="btn btn-danger btn-sm" onclick="revokeAccess(this)">Revoke</button>';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initDashboardCharts();
+});
+</script>
+</body>
+</html>

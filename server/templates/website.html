@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Go Bharat - India's Hyperlocal Super App</title>
+  <meta name="description" content="Go Bharat — India's hyperlocal super app. Shop from local vendors, order food, book services, track deliveries, and support businesses in your neighbourhood." />
+  <meta name="theme-color" content="#FF6B00" />
+  <meta property="og:title" content="Go Bharat — India's Hyperlocal Super App" />
+  <meta property="og:description" content="Shop local, order food, book services and support businesses near you with Go Bharat." />
+  <meta property="og:type" content="website" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Poppins',sans-serif;color:#1A1A2E;overflow-x:hidden}
+    a{text-decoration:none;color:inherit}
+
+    .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 0;transition:all .3s}
+    .nav.scrolled{background:rgba(255,255,255,.97);backdrop-filter:blur(12px);box-shadow:0 2px 20px rgba(0,0,0,.08)}
+    .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:24px}
+    .logo-icon{width:52px;height:38px;flex-shrink:0}
+    .logo-icon img{width:100%;height:100%;object-fit:contain}
+    .logo span{color:#FF6B00}
+    .nav-links{display:flex;gap:32px;align-items:center}
+    .nav-links a{font-weight:500;font-size:15px;color:#4a5568;transition:color .2s}
+    .nav-links a:hover{color:#FF6B00}
+    .nav-btn{background:#FF6B00;color:#fff!important;padding:10px 24px;border-radius:50px;font-weight:600;transition:transform .2s,box-shadow .2s}
+    .nav-btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(255,107,0,.4)}
+
+    .hero{min-height:100vh;background:linear-gradient(135deg,#0B1E3D 0%,#142F5E 50%,#1A3A6B 100%);position:relative;display:flex;align-items:center;overflow:hidden}
+    .hero::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:rgba(255,107,0,.08);top:-200px;right:-100px}
+    .hero::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(255,107,0,.05);bottom:-100px;left:-50px}
+    .hero-inner{max-width:1200px;margin:0 auto;padding:120px 24px 80px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
+    .hero-text h1{font-size:52px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:20px}
+    .hero-text h1 .highlight{color:#FF6B00;position:relative}
+    .hero-text p{font-size:18px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:32px;max-width:500px}
+    .hero-badges{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:36px}
+    .hero-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);padding:8px 16px;border-radius:50px;color:rgba(255,255,255,.9);font-size:13px;font-weight:500;backdrop-filter:blur(4px)}
+    .hero-ctas{display:flex;gap:16px;flex-wrap:wrap}
+    .cta-primary{background:linear-gradient(135deg,#FF6B00,#FF8A33);color:#fff;padding:14px 36px;border-radius:50px;font-weight:700;font-size:16px;display:inline-flex;align-items:center;gap:8px;transition:transform .2s,box-shadow .2s}
+    .cta-primary:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(255,107,0,.4)}
+    .cta-secondary{border:2px solid rgba(255,255,255,.3);color:#fff;padding:12px 32px;border-radius:50px;font-weight:600;font-size:16px;transition:all .2s}
+    .cta-secondary:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.5)}
+
+    .hero-visual{position:relative;display:flex;justify-content:center}
+    .phone-mockup{width:280px;height:560px;background:linear-gradient(180deg,#1a1a2e,#2d2d44);border-radius:36px;padding:12px;position:relative;box-shadow:0 30px 60px rgba(0,0,0,.3)}
+    .phone-screen{width:100%;height:100%;background:linear-gradient(180deg,#FF6B00 0%,#ff8533 30%,#fff 30%);border-radius:26px;overflow:hidden;position:relative}
+    .phone-screen-content{padding:40px 16px 16px;text-align:center}
+    .phone-screen-content .app-name{color:#fff;font-weight:700;font-size:18px;margin-bottom:4px}
+    .phone-screen-content .app-tagline{color:rgba(255,255,255,.8);font-size:11px;margin-bottom:20px}
+    .phone-categories{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 8px}
+    .phone-cat{background:#fff;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .phone-cat-icon{width:36px;height:36px;border-radius:10px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .phone-cat-name{font-size:10px;font-weight:600;color:#1a1a2e}
+    .float-card{position:absolute;background:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;animation:float 3s ease-in-out infinite}
+    .float-card.c1{top:80px;right:-30px;animation-delay:.5s}
+    .float-card.c2{bottom:120px;left:-40px;animation-delay:1s}
+    .float-card.c3{bottom:40px;right:-20px;animation-delay:1.5s}
+    .float-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .float-text{font-size:12px}
+    .float-text strong{display:block;font-size:13px;color:#1a1a2e}
+    .float-text span{color:#6B7280}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+    .stats-bar{background:#fff;padding:40px 0;border-bottom:1px solid #E5E7EB}
+    .stats-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+    .stat-item h3{font-size:36px;font-weight:800;color:#FF6B00}
+    .stat-item p{font-size:14px;color:#6B7280;font-weight:500;margin-top:4px}
+
+    .section{padding:80px 0}
+    .section-inner{max-width:1200px;margin:0 auto;padding:0 24px}
+    .section-header{text-align:center;margin-bottom:56px}
+    .section-label{display:inline-block;background:linear-gradient(135deg,#FF6B00 0%,#FF8A33 100%);color:#fff;padding:6px 18px;border-radius:50px;font-size:13px;font-weight:600;margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase}
+    .section-header h2{font-size:36px;font-weight:800;color:#0B1E3D;margin-bottom:12px}
+    .section-header p{font-size:16px;color:#6B7280;max-width:600px;margin:0 auto}
+
+    .categories-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+    .cat-card{background:#fff;border-radius:20px;padding:32px 24px;text-align:center;border:1px solid #E5E7EB;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+    .cat-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,.1);border-color:transparent}
+    .cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:20px 20px 0 0;transition:height .3s}
+    .cat-card:hover::before{height:100%;opacity:.06}
+    .cat-icon{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;position:relative;z-index:1}
+    .cat-card h3{font-size:18px;font-weight:700;margin-bottom:6px;position:relative;z-index:1}
+    .cat-card p{font-size:13px;color:#6B7280;position:relative;z-index:1}
+    .cat-card.b2b .cat-icon{background:#EBF5FF;color:#3B82F6}.cat-card.b2b::before{background:#3B82F6}
+    .cat-card.b2c .cat-icon{background:#FFF3E6;color:#FF6B00}.cat-card.b2c::before{background:#FF6B00}
+    .cat-card.service .cat-icon{background:#F3EEFF;color:#8B5CF6}.cat-card.service::before{background:#8B5CF6}
+    .cat-card.manpower .cat-icon{background:#E6FFF5;color:#10B981}.cat-card.manpower::before{background:#10B981}
+
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+    .feature-card{background:#fff;border-radius:20px;padding:32px;border:1px solid #E5E7EB;transition:all .3s}
+    .feature-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.08)}
+    .feature-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px}
+    .feature-card h3{font-size:18px;font-weight:700;margin-bottom:8px}
+    .feature-card p{font-size:14px;color:#6B7280;line-height:1.6}
+
+    .how-it-works{background:linear-gradient(135deg,#0B1E3D,#142F5E)}
+    .how-it-works .section-header h2{color:#fff}
+    .how-it-works .section-header p{color:rgba(255,255,255,.6)}
+    .steps-row{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative}
+    .steps-row::before{content:'';position:absolute;top:40px;left:80px;right:80px;height:2px;background:rgba(255,107,0,.3)}
+    .step-card{text-align:center;position:relative;z-index:1}
+    .step-num{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#FF6B00,#FF8A33);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 20px;box-shadow:0 8px 20px rgba(255,107,0,.3)}
+    .step-card h3{font-size:16px;font-weight:700;color:#fff;margin-bottom:8px}
+    .step-card p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.5}
+
+    .vendor-section{background:#FFF8F0}
+    .vendor-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+    .vendor-benefits{list-style:none;display:flex;flex-direction:column;gap:20px}
+    .vendor-benefits li{display:flex;gap:16px;align-items:flex-start}
+    .benefit-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#FF6B00,#FF8A33);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;flex-shrink:0}
+    .benefit-text h4{font-size:16px;font-weight:600;margin-bottom:4px}
+    .benefit-text p{font-size:13px;color:#6B7280;line-height:1.5}
+    .vendor-image{background:linear-gradient(135deg,#0B1E3D,#1A3A6B);border-radius:24px;padding:40px;text-align:center;color:#fff;position:relative;overflow:hidden}
+    .vendor-image::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,107,0,.1);top:-50px;right:-50px}
+    .vendor-image h3{font-size:28px;font-weight:800;margin-bottom:8px;position:relative}
+    .vendor-image p{font-size:14px;opacity:.7;margin-bottom:24px;position:relative}
+    .vendor-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;position:relative}
+    .v-stat{background:rgba(255,255,255,.1);border-radius:14px;padding:20px;text-align:center;backdrop-filter:blur(4px)}
+    .v-stat h4{font-size:24px;font-weight:800;color:#FF6B00}
+    .v-stat p{font-size:12px;opacity:.7;margin-top:4px}
+
+    .roles-section .section-inner{max-width:1000px}
+    .roles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .role-card{background:#fff;border-radius:16px;padding:24px;text-align:center;border:1px solid #E5E7EB;transition:all .3s}
+    .role-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateY(-4px)}
+    .role-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 12px}
+    .role-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+    .role-card p{font-size:12px;color:#6B7280;line-height:1.5}
+
+    .download-section{background:linear-gradient(135deg,#FF6B00,#E55D00);padding:80px 0;text-align:center;color:#fff;position:relative;overflow:hidden}
+    .download-section::before{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(255,255,255,.05);top:-200px;left:-100px}
+    .download-section h2{font-size:36px;font-weight:800;margin-bottom:12px;position:relative}
+    .download-section p{font-size:16px;opacity:.85;margin-bottom:32px;position:relative}
+    .download-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative}
+    .dl-btn{background:#fff;color:#0B1E3D;padding:14px 32px;border-radius:50px;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:10px;transition:transform .2s}
+    .dl-btn:hover{transform:translateY(-3px)}
+    .dl-btn svg{width:22px;height:22px}
+
+    .qr-container{margin-top:36px;position:relative}
+    .qr-box{display:inline-block;background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+    .qr-box canvas{width:160px!important;height:160px!important}
+    .qr-label{font-size:13px;color:rgba(255,255,255,.8);margin-top:12px}
+
+    footer{background:#0B1E3D;color:#fff;padding:60px 0 24px}
+    .footer-inner{max-width:1200px;margin:0 auto;padding:0 24px}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+    .footer-brand .logo{margin-bottom:12px}
+    .footer-brand p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;max-width:300px}
+    .footer-col h4{font-size:14px;font-weight:700;margin-bottom:16px;color:#FF6B00}
+    .footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.6);margin-bottom:10px;transition:color .2s}
+    .footer-col a:hover{color:#FF6B00}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:rgba(255,255,255,.4)}
+
+    .city-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,0,.1);color:#FF6B00;padding:6px 14px;border-radius:50px;font-size:13px;font-weight:600;margin-bottom:16px}
+
+    @media(max-width:900px){
+      .nav-links{display:none}
+      .hero-inner{grid-template-columns:1fr;text-align:center;padding:100px 24px 60px}
+      .hero-text h1{font-size:36px}
+      .hero-text p{margin:0 auto 24px}
+      .hero-badges{justify-content:center}
+      .hero-ctas{justify-content:center}
+      .hero-visual{margin-top:40px}
+      .stats-inner{grid-template-columns:repeat(2,1fr)}
+      .categories-grid{grid-template-columns:repeat(2,1fr)}
+      .features-grid{grid-template-columns:1fr}
+      .steps-row{grid-template-columns:repeat(2,1fr)}
+      .steps-row::before{display:none}
+      .vendor-grid{grid-template-columns:1fr}
+      .roles-grid{grid-template-columns:1fr}
+      .footer-grid{grid-template-columns:1fr 1fr}
+      .float-card{display:none}
+    }
+    @media(max-width:600px){
+      .hero-text h1{font-size:28px}
+      .categories-grid{grid-template-columns:1fr 1fr}
+      .steps-row{grid-template-columns:1fr}
+      .footer-grid{grid-template-columns:1fr}
+      .footer-bottom{flex-direction:column;gap:8px;text-align:center}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <div class="logo-icon"><img src="/assets/images/go-bharat-logo-nobg.png" alt="Go Bharat"></div>
+      Go<span>Bharat</span>
+    </a>
+    <div class="nav-links">
+      <a href="#categories">Categories</a>
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#vendors">For Vendors</a>
+      <a href="/admin" class="nav-btn">Admin Panel</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="city-tag">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+        Malegaon, Maharashtra
+      </div>
+      <h1>India's <span class="highlight">Hyperlocal</span> Super App</h1>
+      <p>Shop, order, discover services and connect with local businesses. Everything you need from your neighborhood, delivered to your door.</p>
+      <div class="hero-badges">
+        <span class="hero-badge">B2B Wholesale</span>
+        <span class="hero-badge">B2C Retail</span>
+        <span class="hero-badge">Services</span>
+        <span class="hero-badge">Manpower</span>
+      </div>
+      <div class="hero-ctas">
+        <a href="#download" class="cta-primary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+          Download App
+        </a>
+        <a href="#vendors" class="cta-secondary">Become a Vendor</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="phone-mockup">
+        <div class="phone-screen">
+          <div class="phone-screen-content">
+            <div class="app-name">Go Bharat</div>
+            <div class="app-tagline">Your Neighborhood, Delivered</div>
+            <div class="phone-categories">
+              <div class="phone-cat"><div class="phone-cat-icon" style="background:#EBF5FF;color:#3B82F6">&#128188;</div><div class="phone-cat-name">B2B</div></div>
+              <div class="phone-cat"><div class="phone-cat-icon" style="background:#FFF3E6;color:#FF6B00">&#127978;</div><div class="phone-cat-name">B2C</div></div>
+              <div class="phone-cat"><div class="phone-cat-icon" style="background:#F3EEFF;color:#8B5CF6">&#128736;</div><div class="phone-cat-name">Service</div></div>
+              <div class="phone-cat"><div class="phone-cat-icon" style="background:#E6FFF5;color:#10B981">&#128101;</div><div class="phone-cat-name">Manpower</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="float-card c1">
+        <div class="float-icon" style="background:#E6FFF5;color:#10B981">&#9989;</div>
+        <div class="float-text"><strong>Order Delivered</strong><span>2 min ago</span></div>
+      </div>
+      <div class="float-card c2">
+        <div class="float-icon" style="background:#FFF3E6;color:#FF6B00">&#127381;</div>
+        <div class="float-text"><strong>20% OFF</strong><span>Flash Sale Live</span></div>
+      </div>
+      <div class="float-card c3">
+        <div class="float-icon" style="background:#EBF5FF;color:#3B82F6">&#11088;</div>
+        <div class="float-text"><strong>4.8 Rating</strong><span>15K+ Reviews</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><h3>500+</h3><p>Local Vendors</p></div>
+    <div class="stat-item"><h3>15K+</h3><p>Happy Customers</p></div>
+    <div class="stat-item"><h3>50K+</h3><p>Orders Delivered</p></div>
+    <div class="stat-item"><h3>100+</h3><p>Sub-Categories</p></div>
+  </div>
+</section>
+
+<section class="section" id="categories">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">Explore</div>
+      <h2>4 Major Categories</h2>
+      <p>From wholesale B2B to daily retail, professional services and manpower solutions</p>
+    </div>
+    <div class="categories-grid">
+      <div class="cat-card b2b">
+        <div class="cat-icon">&#128188;</div>
+        <h3>B2B Wholesale</h3>
+        <p>Bulk orders, raw materials, industrial supplies and wholesale grocery</p>
+      </div>
+      <div class="cat-card b2c">
+        <div class="cat-icon">&#127978;</div>
+        <h3>B2C Retail</h3>
+        <p>Food, fashion, electronics, beauty, grocery and daily essentials</p>
+      </div>
+      <div class="cat-card service">
+        <div class="cat-icon">&#128736;</div>
+        <h3>Services</h3>
+        <p>Home services, beauty, repair, professional and healthcare services</p>
+      </div>
+      <div class="cat-card manpower">
+        <div class="cat-icon">&#128101;</div>
+        <h3>Manpower</h3>
+        <p>Delivery partners, skilled workers, domestic help and event staff</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features" style="background:#F5F6FA">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">Features</div>
+      <h2>Why Choose Go Bharat?</h2>
+      <p>Built for India, designed for local businesses and customers</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FFF3E6;color:#FF6B00">&#128666;</div>
+        <h3>Express Delivery</h3>
+        <p>Get your orders delivered within 30 minutes from local vendors in your neighborhood</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EBF5FF;color:#3B82F6">&#128179;</div>
+        <h3>UPI & All Payments</h3>
+        <p>Pay via Google Pay, PhonePe, Paytm, cards, net banking or cash on delivery</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F3EEFF;color:#8B5CF6">&#127916;</div>
+        <h3>Social Commerce</h3>
+        <p>Discover products through Instagram-style reels with direct shopping integration</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E6FFF5;color:#10B981">&#129302;</div>
+        <h3>AI-Powered</h3>
+        <p>Smart product listings, AI ad generation and intelligent recommendations for vendors</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FEF3C7;color:#F59E0B">&#127873;</div>
+        <h3>Coupons & Wallet</h3>
+        <p>Exclusive discounts, Go Bharat wallet cashbacks and daily offers from local stores</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FEE2E2;color:#EF4444">&#128205;</div>
+        <h3>Hyperlocal Focus</h3>
+        <p>Support local businesses in Malegaon. Everything from your neighborhood at your fingertips</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section how-it-works" id="how-it-works">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">Simple Process</div>
+      <h2>How It Works</h2>
+      <p>Get started in 4 easy steps</p>
+    </div>
+    <div class="steps-row">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Download App</h3>
+        <p>Get Go Bharat from App Store or Google Play</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Browse & Shop</h3>
+        <p>Explore categories, vendors and products near you</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Pay Securely</h3>
+        <p>Choose UPI, card, wallet or cash on delivery</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h3>Get Delivered</h3>
+        <p>Track your order in real-time till your doorstep</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section vendor-section" id="vendors">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">For Business</div>
+      <h2>Grow Your Business with Go Bharat</h2>
+      <p>Join 500+ local vendors already thriving on our platform</p>
+    </div>
+    <div class="vendor-grid">
+      <ul class="vendor-benefits">
+        <li>
+          <div class="benefit-icon">&#128200;</div>
+          <div class="benefit-text"><h4>Increase Revenue</h4><p>Reach thousands of new customers in your locality without any upfront cost</p></div>
+        </li>
+        <li>
+          <div class="benefit-icon">&#128241;</div>
+          <div class="benefit-text"><h4>Easy Dashboard</h4><p>Manage products, orders, payouts and customer reviews from your phone</p></div>
+        </li>
+        <li>
+          <div class="benefit-icon">&#127916;</div>
+          <div class="benefit-text"><h4>Reel Promotion</h4><p>Create video reels with product tags for social commerce marketing</p></div>
+        </li>
+        <li>
+          <div class="benefit-icon">&#129302;</div>
+          <div class="benefit-text"><h4>AI Ad Generator</h4><p>Upload product photos and let AI create stunning promotional ads instantly</p></div>
+        </li>
+        <li>
+          <div class="benefit-icon">&#128176;</div>
+          <div class="benefit-text"><h4>Fast Settlements</h4><p>Weekly payouts with transparent commission structure and bank settlement</p></div>
+        </li>
+      </ul>
+      <div class="vendor-image">
+        <h3>Partner with Us</h3>
+        <p>Low commission, high growth potential</p>
+        <div class="vendor-stats">
+          <div class="v-stat"><h4>5%</h4><p>Starting Commission</p></div>
+          <div class="v-stat"><h4>3x</h4><p>Revenue Growth</p></div>
+          <div class="v-stat"><h4>24/7</h4><p>Support Available</p></div>
+          <div class="v-stat"><h4>0</h4><p>Joining Fee</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section roles-section" style="background:#F5F6FA">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">Opportunities</div>
+      <h2>Join the Go Bharat Ecosystem</h2>
+      <p>Multiple roles, multiple earning opportunities</p>
+    </div>
+    <div class="roles-grid">
+      <div class="role-card">
+        <div class="role-icon" style="background:#FFF3E6;color:#FF6B00">&#128722;</div>
+        <h3>Customer</h3>
+        <p>Shop from local vendors, discover deals and get fast delivery</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:#EBF5FF;color:#3B82F6">&#127978;</div>
+        <h3>Vendor</h3>
+        <p>List products, manage orders and grow your business online</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:#E6FFF5;color:#10B981">&#128690;</div>
+        <h3>Delivery Partner</h3>
+        <p>Earn by delivering orders with flexible hours and instant payouts</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:#F3EEFF;color:#8B5CF6">&#127969;</div>
+        <h3>Franchise Owner</h3>
+        <p>Own a territory, manage vendors and earn commission on every order</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:#FEF3C7;color:#F59E0B">&#128227;</div>
+        <h3>Marketing Executive</h3>
+        <p>Onboard vendors, earn incentives and grow with tier-based commissions</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon" style="background:#FEE2E2;color:#EF4444">&#128272;</div>
+        <h3>Super Admin</h3>
+        <p>Full platform management with analytics, settings and control</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="download-section" id="download">
+  <div class="section-inner">
+    <h2>Download Go Bharat Today</h2>
+    <p>Available on iOS and Android. Scan the QR code or click below.</p>
+    <div class="download-btns">
+      <a href="https://apps.apple.com/app/id982107779" target="_blank" class="dl-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        App Store
+      </a>
+      <a href="https://play.google.com/store/apps/details?id=host.exp.exponent" target="_blank" class="dl-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/></svg>
+        Google Play
+      </a>
+    </div>
+    <div class="qr-container">
+      <div class="qr-box" id="qr-code-dl"></div>
+      <p class="qr-label">Scan with Expo Go to preview</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-icon"><img src="/assets/images/go-bharat-logo-nobg.png" alt="Go Bharat"></div>
+          Go<span>Bharat</span>
+        </div>
+        <p>India's hyperlocal super app connecting local businesses with customers. Built for Malegaon, designed for Bharat.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="/about">About Us</a>
+        <a href="/careers">Careers</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <a href="/help">Help Center</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/refund">Refund Policy</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="mailto:gobharatservice@gmail.com">gobharatservice@gmail.com</a>
+        <a href="tel:+918177977700">8177977700</a>
+        <a href="#">Instagram</a>
+        <a href="#">WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Go Bharat. All rights reserved.</span>
+      <span>Made with love in Malegaon, Maharashtra</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+<script>
+  window.addEventListener('scroll',()=>{
+    document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50);
+  });
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      const t=document.querySelector(a.getAttribute('href'));
+      if(t)t.scrollIntoView({behavior:'smooth'});
+    });
+  });
+  try{
+    const qr=new QRCodeStyling({width:320,height:320,data:"exps://EXPS_URL_PLACEHOLDER",dotsOptions:{color:"#FF6B00",type:"rounded"},backgroundOptions:{color:"#ffffff"},cornersSquareOptions:{type:"extra-rounded",color:"#0B1E3D"},cornersDotOptions:{type:"dot",color:"#0B1E3D"},qrOptions:{errorCorrectionLevel:"H"}});
+    qr.append(document.getElementById('qr-code-dl'));
+  }catch(e){}
+</script>
+</body>
+</html>

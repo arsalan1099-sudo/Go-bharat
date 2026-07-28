@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Go Bharat vendor map — explore local shops, services, and vendors near you." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #map { width: 100%; height: 100%; }
+    .layer-control { position: absolute; top: 10px; right: 10px; z-index: 1000; background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.15); overflow: hidden; }
+    .layer-btn { display: flex; flex-direction: column; align-items: center; padding: 8px 12px; cursor: pointer; border: none; background: white; font-size: 11px; font-family: 'Poppins', sans-serif; color: #666; min-width: 56px; transition: background 0.15s; }
+    .layer-btn.active { background: #FFF5EE; color: #FF6B00; font-weight: 600; }
+    .layer-btn:hover { background: #f9f9f9; }
+    .layer-btn + .layer-btn { border-top: 1px solid #f0f0f0; }
+    .layer-icon { font-size: 18px; margin-bottom: 2px; }
+    .search-bar { position: absolute; top: 10px; left: 10px; right: 80px; z-index: 1000; }
+    .search-input { width: 100%; padding: 12px 16px 12px 40px; border: none; border-radius: 12px; font-size: 14px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.12); outline: none; font-family: 'Poppins', sans-serif; }
+    .search-input:focus { box-shadow: 0 2px 12px rgba(255,107,0,0.25); }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #999; font-size: 16px; }
+    .filter-bar { position: absolute; top: 56px; left: 0; right: 0; z-index: 1000; display: flex; gap: 6px; padding: 0 10px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-chip { display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 20px; background: white; font-size: 12px; font-family: 'Poppins', sans-serif; cursor: pointer; white-space: nowrap; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border: none; color: #333; font-weight: 500; transition: all 0.15s; }
+    .filter-chip:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .filter-chip.active { color: white; }
+    .vendor-count { position: absolute; bottom: 20px; left: 10px; z-index: 1000; background: white; padding: 6px 14px; border-radius: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 13px; font-family: 'Poppins', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .recenter-btn { position: absolute; bottom: 20px; right: 10px; z-index: 1000; background: white; width: 44px; height: 44px; border-radius: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: transform 0.15s; }
+    .recenter-btn:hover { transform: scale(1.05); }
+    .leaflet-popup-content-wrapper { border-radius: 16px !important; padding: 0 !important; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important; }
+    .leaflet-popup-content { margin: 0 !important; min-width: 260px; max-width: 300px; }
+    .leaflet-popup-tip { box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important; }
+    .vendor-popup { font-family: 'Poppins', sans-serif; }
+    .vendor-popup-img { width: 100%; height: 120px; object-fit: cover; }
+    .vendor-popup-body { padding: 12px; }
+    .vendor-popup-name { font-size: 15px; font-weight: 700; color: #0B1E3D; margin-bottom: 2px; }
+    .vendor-popup-desc { font-size: 12px; color: #666; margin-bottom: 8px; }
+    .vendor-popup-meta { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+    .vendor-popup-badge { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; }
+    .vendor-popup-rating { display: flex; align-items: center; gap: 2px; font-size: 12px; font-weight: 600; }
+    .vendor-popup-products { border-top: 1px solid #f0f0f0; padding-top: 8px; }
+    .vendor-popup-product { display: flex; align-items: center; gap: 8px; padding: 6px 0; cursor: pointer; }
+    .vendor-popup-product:hover { background: #f9f9f9; border-radius: 8px; }
+    .vendor-popup-product img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; }
+    .vendor-popup-product-info { flex: 1; }
+    .vendor-popup-product-name { font-size: 12px; font-weight: 500; color: #333; }
+    .vendor-popup-product-price { font-size: 12px; font-weight: 700; color: #FF6B00; }
+    .vendor-popup-product-orig { font-size: 10px; color: #999; text-decoration: line-through; margin-left: 4px; }
+    .add-cart-btn { background: #FF6B00; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: 600; font-family: 'Poppins', sans-serif; transition: background 0.15s; }
+    .add-cart-btn:hover { background: #e55d00; }
+    .visit-store-btn { display: block; width: 100%; padding: 10px; background: #0B1E3D; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; margin-top: 8px; font-family: 'Poppins', sans-serif; transition: background 0.15s; }
+    .visit-store-btn:hover { background: #142F5E; }
+    .open-badge { background: #DCFCE7; color: #16A34A; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; }
+    .closed-badge { background: #FEE2E2; color: #DC2626; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; }
+    .leaflet-control-zoom { border-radius: 12px !important; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; border: none !important; }
+    .leaflet-control-zoom a { width: 36px !important; height: 36px !important; line-height: 36px !important; font-size: 18px !important; border: none !important; color: #333 !important; }
+    .leaflet-control-zoom a:hover { background: #f5f5f5 !important; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    var vendorsData = [];
+    var productsData = [];
+    var currentFilter = 'all';
+    var markersLayer;
+    var searchQuery = '';
+
+    var categoryColors = { "1": "#3B82F6", "2": "#FF6B00", "3": "#8B5CF6", "4": "#10B981" };
+    var categoryNames = { "1": "B2B", "2": "B2C", "3": "Service", "4": "Manpower" };
+
+    var map = L.map('map', { zoomControl: false }).setView([20.5547, 74.5247], 13);
+
+    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '\u00a9 OpenStreetMap',
+      maxZoom: 19
+    });
+
+    var satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '\u00a9 Esri',
+      maxZoom: 19
+    });
+
+    var labelsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '\u00a9 OpenStreetMap',
+      maxZoom: 19,
+      opacity: 0.45
+    });
+
+    osmLayer.addTo(map);
+    var currentLayerName = 'map';
+    var labelsAdded = false;
+
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+    function createControls() {
+      var layerDiv = document.createElement('div');
+      layerDiv.className = 'layer-control';
+      layerDiv.innerHTML =
+        '<button class="layer-btn active" data-layer="map"><span class="layer-icon">\uD83D\uDDFA\uFE0F</span>Map</button>' +
+        '<button class="layer-btn" data-layer="satellite"><span class="layer-icon">\uD83D\uDEF0\uFE0F</span>Satellite</button>' +
+        '<button class="layer-btn" data-layer="street"><span class="layer-icon">\uD83C\uDFD9\uFE0F</span>Street</button>';
+      document.body.appendChild(layerDiv);
+
+      layerDiv.querySelectorAll('.layer-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var layer = btn.dataset.layer;
+          switchLayer(layer);
+          layerDiv.querySelectorAll('.layer-btn').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+        });
+      });
+
+      var searchDiv = document.createElement('div');
+      searchDiv.className = 'search-bar';
+      searchDiv.innerHTML = '<span class="search-icon">\uD83D\uDD0D</span><input class="search-input" placeholder="Search vendors near you..." />';
+      document.body.appendChild(searchDiv);
+
+      var searchInput = searchDiv.querySelector('.search-input');
+      searchInput.addEventListener('input', function(e) {
+        searchQuery = e.target.value.toLowerCase();
+        renderMarkers();
+      });
+
+      var filterDiv = document.createElement('div');
+      filterDiv.className = 'filter-bar';
+      var filters = [
+        { id: 'all', label: 'All', color: '#0B1E3D' },
+        { id: '1', label: 'B2B', color: '#3B82F6' },
+        { id: '2', label: 'B2C', color: '#FF6B00' },
+        { id: '3', label: 'Service', color: '#8B5CF6' },
+        { id: '4', label: 'Manpower', color: '#10B981' }
+      ];
+      filters.forEach(function(f) {
+        var chip = document.createElement('button');
+        chip.className = 'filter-chip' + (f.id === 'all' ? ' active' : '');
+        chip.dataset.filter = f.id;
+        if (f.id === 'all') {
+          chip.style.background = f.color;
+          chip.style.color = 'white';
+        }
+        chip.textContent = f.label;
+        chip.addEventListener('click', function() {
+          currentFilter = f.id;
+          filterDiv.querySelectorAll('.filter-chip').forEach(function(c) {
+            c.classList.remove('active');
+            c.style.background = 'white';
+            c.style.color = '#333';
+          });
+          chip.classList.add('active');
+          chip.style.background = f.color;
+          chip.style.color = 'white';
+          renderMarkers();
+          notifyParent('filterChange', { filter: f.id });
+        });
+        filterDiv.appendChild(chip);
+      });
+      document.body.appendChild(filterDiv);
+
+      var countDiv = document.createElement('div');
+      countDiv.className = 'vendor-count';
+      countDiv.id = 'vendor-count';
+      countDiv.textContent = '0 stores nearby';
+      document.body.appendChild(countDiv);
+
+      var recenterBtn = document.createElement('button');
+      recenterBtn.className = 'recenter-btn';
+      recenterBtn.innerHTML = '\uD83D\uDCCD';
+      recenterBtn.addEventListener('click', function() {
+        map.setView([20.5547, 74.5247], 13);
+      });
+      document.body.appendChild(recenterBtn);
+    }
+
+    function switchLayer(layer) {
+      map.removeLayer(osmLayer);
+      map.removeLayer(satelliteLayer);
+      if (labelsAdded) { map.removeLayer(labelsLayer); labelsAdded = false; }
+
+      if (layer === 'map') {
+        osmLayer.addTo(map);
+      } else if (layer === 'satellite') {
+        satelliteLayer.addTo(map);
+      } else if (layer === 'street') {
+        satelliteLayer.addTo(map);
+        labelsLayer.addTo(map);
+        labelsAdded = true;
+      }
+      currentLayerName = layer;
+    }
+
+    function getVendorProducts(vendorId) {
+      return productsData.filter(function(p) { return p.vendorId === vendorId; }).slice(0, 3);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function createPopupContent(vendor) {
+      var vProducts = getVendorProducts(vendor.id);
+      var catColor = categoryColors[vendor.categoryId] || '#FF6B00';
+      var catName = categoryNames[vendor.categoryId] || 'B2C';
+
+      var productsHtml = '';
+      if (vProducts.length > 0) {
+        productsHtml = '<div class="vendor-popup-products">';
+        vProducts.forEach(function(p) {
+          var origPrice = p.originalPrice ? '<span class="vendor-popup-product-orig">\u20B9' + p.originalPrice + '</span>' : '';
+          productsHtml +=
+            '<div class="vendor-popup-product">' +
+              '<img src="' + escapeHtml(p.image) + '" alt="' + escapeHtml(p.name) + '" onerror="this.style.display=\'none\'" />' +
+              '<div class="vendor-popup-product-info">' +
+                '<div class="vendor-popup-product-name">' + escapeHtml(p.name) + '</div>' +
+                '<div><span class="vendor-popup-product-price">\u20B9' + p.price + '</span>' + origPrice + '</div>' +
+              '</div>' +
+              '<button class="add-cart-btn" onclick="addToCart(\'' + escapeHtml(p.id) + '\',\'' + escapeHtml(vendor.id) + '\',\'' + escapeHtml(vendor.name) + '\')">+ Add</button>' +
+            '</div>';
+        });
+        productsHtml += '</div>';
+      }
+
+      return '<div class="vendor-popup">' +
+        '<img class="vendor-popup-img" src="' + escapeHtml(vendor.image) + '" alt="' + escapeHtml(vendor.name) + '" onerror="this.src=\'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400\'" />' +
+        '<div class="vendor-popup-body">' +
+          '<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">' +
+            '<div class="vendor-popup-name">' + escapeHtml(vendor.name) + '</div>' +
+            '<span class="' + (vendor.isOpen ? 'open-badge' : 'closed-badge') + '">' + (vendor.isOpen ? 'OPEN' : 'CLOSED') + '</span>' +
+          '</div>' +
+          '<div class="vendor-popup-desc">' + escapeHtml(vendor.description) + '</div>' +
+          '<div class="vendor-popup-meta">' +
+            '<span class="vendor-popup-badge" style="background:' + catColor + '15;color:' + catColor + '">' + catName + '</span>' +
+            '<span class="vendor-popup-rating">\u2B50 ' + vendor.rating + '</span>' +
+            '<span style="font-size:11px;color:#666">\uD83D\uDCCD ' + escapeHtml(vendor.distance) + '</span>' +
+            '<span style="font-size:11px;color:#666">\uD83D\uDD50 ' + escapeHtml(vendor.deliveryTime) + '</span>' +
+          '</div>' +
+          productsHtml +
+          '<button class="visit-store-btn" onclick="visitStore(\'' + escapeHtml(vendor.id) + '\')">Visit Store \u2192</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function renderMarkers() {
+      if (markersLayer) map.removeLayer(markersLayer);
+      markersLayer = L.layerGroup();
+
+      var filtered = vendorsData;
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(function(v) { return v.categoryId === currentFilter; });
+      }
+      if (searchQuery) {
+        filtered = filtered.filter(function(v) {
+          return v.name.toLowerCase().indexOf(searchQuery) !== -1 || v.description.toLowerCase().indexOf(searchQuery) !== -1;
+        });
+      }
+
+      var bounds = map.getBounds();
+      var visible = filtered.filter(function(v) { return bounds.contains([v.lat, v.lng]); });
+      if (visible.length > 300) visible = visible.slice(0, 300);
+      if (visible.length < 50 && filtered.length > 50) {
+        visible = filtered.slice(0, 200);
+      }
+
+      visible.forEach(function(vendor) {
+        var catColor = categoryColors[vendor.categoryId] || '#FF6B00';
+        var marker = L.circleMarker([vendor.lat, vendor.lng], {
+          radius: 8,
+          fillColor: catColor,
+          color: 'white',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.9
+        });
+
+        marker.bindPopup(createPopupContent(vendor), { maxWidth: 300, minWidth: 260 });
+        marker.on('click', function() { notifyParent('vendorSelect', { vendorId: vendor.id }); });
+        markersLayer.addLayer(marker);
+      });
+
+      markersLayer.addTo(map);
+      var countEl = document.getElementById('vendor-count');
+      if (countEl) countEl.textContent = filtered.length + ' stores nearby';
+    }
+
+    function addToCart(productId, vendorId, vendorName) {
+      notifyParent('addToCart', { productId: productId, vendorId: vendorId, vendorName: vendorName });
+    }
+
+    function visitStore(vendorId) {
+      notifyParent('visitStore', { vendorId: vendorId });
+    }
+
+    function notifyParent(type, data) {
+      var msg = JSON.parse(JSON.stringify(data || {}));
+      msg.type = type;
+      window.parent.postMessage(JSON.stringify(msg), '*');
+    }
+
+    window.addEventListener('message', function(event) {
+      try {
+        var msg;
+        if (typeof event.data === 'string') {
+          msg = JSON.parse(event.data);
+        } else {
+          msg = event.data;
+        }
+        if (msg.type === 'setData') {
+          vendorsData = msg.vendors || [];
+          productsData = msg.products || [];
+          renderMarkers();
+        } else if (msg.type === 'setFilter') {
+          currentFilter = msg.filter;
+          renderMarkers();
+        }
+      } catch(e) {}
+    });
+
+    map.on('moveend', function() { renderMarkers(); });
+
+    createControls();
+
+    notifyParent('mapReady', {});
+  </script>
+</body>
+</html>
